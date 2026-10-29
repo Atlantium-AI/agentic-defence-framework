@@ -3,401 +3,321 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Machine-Speed Containment | Atlantium AI</title>
+<title>90-Day Containment Plan | Atlantium AI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --night: #030507;
-    --card: #0e1521;
-    --line-dark: #1d283a;
-    --atlantic: #0d4896;
-    --atlantic-700: #0a3a7a;
-    --sky: #5699f0;
-    --teal: #2bd4bd;
-    --teal-deep: #3f8f9a;
+    --navy: #0d4896;
+    --teal: #3f8f9a;
     --ink: #0f172a;
     --text: #1e293b;
     --muted: #64748b;
-    --line: #e2e8f0;
-    --paper: #ffffff;
-    --tint: #f4f8fd;
-    --amber: #f2c45b;
+    --line: #dde3eb;
+    --tint: #f3f6fa;
   }
   * { box-sizing: border-box; }
   html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  body {
-    margin: 0;
-    background: #dfe5ee;
-    color: var(--text);
-    font: 400 10.5pt/1.55 Inter, system-ui, sans-serif;
-  }
-  h1, h2, h3 { font-family: "Plus Jakarta Sans", Inter, system-ui, sans-serif; color: var(--ink); margin: 0; }
-  h2 { font-size: 19pt; font-weight: 800; letter-spacing: -0.01em; }
-  h3 { font-size: 11.5pt; font-weight: 700; }
-  p { margin: 0 0 8pt; }
-  strong { color: var(--ink); font-weight: 600; }
+  body { margin: 0; background: #e6eaf0; color: var(--text); font: 400 9.4pt/1.45 Inter, system-ui, sans-serif; }
+  .doc { max-width: 8.5in; margin: 24px auto; background: #fff; padding: 0.6in 0.65in; box-shadow: 0 4px 20px rgba(15,23,42,.08); }
+  h1, h2, h3 { color: var(--ink); margin: 0; font-weight: 700; }
+  h1 { font-size: 17pt; letter-spacing: -0.01em; }
+  h2 { font-size: 12.5pt; margin: 18pt 0 6pt; padding-bottom: 3pt; border-bottom: 2px solid var(--navy); }
+  h3 { font-size: 10pt; margin: 10pt 0 4pt; }
+  p { margin: 0 0 6pt; }
+  ul, ol { margin: 2pt 0 6pt; padding-left: 15pt; }
+  li { margin-bottom: 2pt; }
+  strong { color: var(--ink); }
+  code { font: 8.5pt ui-monospace, Consolas, monospace; background: var(--tint); padding: 0 3pt; border-radius: 3px; }
 
-  .page {
-    width: 8.5in; min-height: 11in; margin: 0.35in auto; padding: 0.7in 0.75in 0.85in;
-    background: var(--paper); position: relative; overflow: hidden;
-    box-shadow: 0 6px 30px rgba(15, 23, 42, 0.12);
-  }
-  .page + .page { page-break-before: always; }
-  .footer {
-    position: absolute; left: 0.75in; right: 0.75in; bottom: 0.4in;
-    display: flex; justify-content: space-between; align-items: center;
-    font-size: 8pt; color: var(--muted); border-top: 1px solid var(--line); padding-top: 8pt;
-  }
-  .footer b { color: var(--atlantic); font-weight: 600; }
-  .eyebrow {
-    display: inline-block; font: 600 8pt Inter, sans-serif; letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--teal-deep); margin-bottom: 6pt;
-  }
-  .section { margin-top: 18pt; }
-  .section > h2 { margin-bottom: 8pt; }
-  .lede { font-size: 11.5pt; color: #334155; max-width: 6.3in; }
+  .masthead { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 8pt; margin-bottom: 12pt; }
+  .masthead .brand { display: flex; align-items: center; gap: 7pt; font-weight: 600; color: var(--navy); }
+  .masthead img { width: 26px; height: 26px; object-fit: contain; }
+  .masthead .meta { font-size: 8pt; color: var(--muted); text-align: right; }
+  .label { font-size: 7.6pt; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--teal); }
 
-  /* Cover */
-  .cover {
-    background: radial-gradient(1200px 600px at 85% -10%, rgba(13, 72, 150, 0.55), transparent 60%),
-                radial-gradient(800px 500px at -10% 110%, rgba(43, 212, 189, 0.16), transparent 60%),
-                var(--night);
-    color: #e1e7ef; display: flex; flex-direction: column; padding: 0.8in 0.85in;
-  }
-  .brand { display: flex; align-items: center; gap: 10pt; }
-  .brand img { width: 44px; height: 44px; object-fit: contain; }
-  .brand span { font: 700 14pt "Plus Jakarta Sans", sans-serif; color: var(--sky); letter-spacing: -0.01em; }
-  .cover .pill {
-    margin-top: 1.6in; align-self: flex-start; border: 1px solid #22314a; border-radius: 999px;
-    padding: 4pt 11pt; font-size: 8.5pt; color: #cbd5e1; background: rgba(14, 21, 33, 0.7);
-  }
-  .cover h1 {
-    color: #fff; font-size: 40pt; line-height: 1.05; font-weight: 800; letter-spacing: -0.02em; margin-top: 16pt;
-  }
-  .cover h1 em { font-style: normal; color: var(--teal); }
-  .cover .sub { font-size: 13pt; color: #94a3b8; margin-top: 14pt; max-width: 5.6in; line-height: 1.45; }
-  .cover-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12pt; margin-top: 0.9in; }
-  .cover-stats div { border-top: 2px solid var(--atlantic); padding-top: 8pt; }
-  .cover-stats b { display: block; font: 800 22pt "Plus Jakarta Sans", sans-serif; color: #fff; }
-  .cover-stats span { font-size: 8.5pt; color: #94a3b8; }
-  .cover-foot {
-    margin-top: auto; display: flex; justify-content: space-between; font-size: 8.5pt; color: #64748b;
-    border-top: 1px solid #1d283a; padding-top: 10pt;
-  }
-  .cover-foot b { color: var(--sky); font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; margin: 4pt 0 8pt; font-size: 8.4pt; }
+  th { text-align: left; font-weight: 600; color: var(--muted); font-size: 7.6pt; text-transform: uppercase; letter-spacing: .05em; border-bottom: 1.5px solid var(--ink); padding: 3pt 5pt; }
+  td { border-bottom: 1px solid var(--line); padding: 4pt 5pt; vertical-align: top; }
+  tr { break-inside: avoid; }
+  td.k { font-weight: 600; color: var(--ink); }
+  .id { color: var(--muted); font-size: 7.6pt; font-weight: 400; white-space: nowrap; }
+  .auto { color: #0f766e; font-weight: 600; }
+  .rec { color: var(--navy); font-weight: 600; }
+  .hum { color: #92600a; font-weight: 600; }
 
-  /* Components */
-  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8pt; margin: 12pt 0 4pt; }
-  .kpi { background: var(--tint); border: 1px solid #dbe6f5; border-radius: 10px; padding: 10pt 11pt; }
-  .kpi b { display: block; font: 800 18pt "Plus Jakarta Sans", sans-serif; color: var(--atlantic); line-height: 1.1; }
-  .kpi span { font-size: 8.3pt; color: var(--muted); line-height: 1.35; display: block; margin-top: 3pt; }
-  .note { font-size: 8pt; color: var(--muted); }
+  .box { background: var(--tint); border-left: 3px solid var(--navy); padding: 7pt 10pt; margin: 6pt 0 8pt; }
+  .box p:last-child { margin: 0; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14pt; }
+  .small { font-size: 8pt; color: var(--muted); }
+  .break { break-before: page; }
+  .section-intro { color: var(--muted); font-size: 8.6pt; margin-bottom: 4pt; }
 
-  .callout {
-    border-left: 3px solid var(--teal); background: #f0fbf9; padding: 9pt 12pt; border-radius: 0 8px 8px 0; margin: 10pt 0;
-  }
-  .callout p:last-child { margin: 0; }
-
-  .tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8pt; margin-top: 8pt; }
-  .tier { border: 1px solid var(--line); border-radius: 10px; padding: 10pt 11pt; }
-  .tier .tag { font: 700 8pt Inter, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; }
-  .tier h3 { margin: 3pt 0 4pt; }
-  .tier p { font-size: 9pt; color: #475569; margin: 0; }
-  .t0 .tag { color: var(--muted); }
-  .t1 { border-color: #b9d2f3; background: var(--tint); }
-  .t1 .tag { color: var(--atlantic); }
-  .t2 { border-color: #b5ece4; background: #f2fcfa; }
-  .t2 .tag { color: var(--teal-deep); }
-
-  .vectors { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8pt; margin-top: 8pt; }
-  .vector { background: var(--card); color: #cbd5e1; border-radius: 10px; padding: 10pt 11pt; }
-  .vector h3 { color: #fff; font-size: 11pt; }
-  .vector .k { color: var(--teal); font: 700 8pt Inter, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; }
-  .vector p { font-size: 8.8pt; margin: 4pt 0 0; color: #a3b1c6; }
-
-  .timeline { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9pt; margin-top: 10pt; }
-  .phase { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
-  .phase header { padding: 9pt 11pt; color: #fff; }
-  .phase:nth-child(1) header { background: var(--atlantic-700); }
-  .phase:nth-child(2) header { background: var(--atlantic); }
-  .phase:nth-child(3) header { background: linear-gradient(120deg, var(--atlantic), var(--teal-deep)); }
-  .phase header small { font: 600 8pt Inter, sans-serif; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.8; }
-  .phase header h3 { color: #fff; font-size: 12pt; margin-top: 2pt; }
-  .phase ul { margin: 0; padding: 9pt 11pt 4pt 24pt; font-size: 8.8pt; flex: 1; }
-  .phase li { margin-bottom: 4pt; }
-  .phase .exit { margin: 0 9pt 9pt; padding: 7pt 9pt; background: var(--tint); border-radius: 8px; font-size: 8.3pt; color: #334155; }
-  .phase .exit b { color: var(--atlantic); }
-
-  table { width: 100%; border-collapse: collapse; font-size: 8.8pt; margin-top: 8pt; }
-  th { text-align: left; font: 600 7.8pt Inter, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
-       border-bottom: 1.5px solid var(--ink); padding: 5pt 6pt; }
-  td { border-bottom: 1px solid var(--line); padding: 6pt; vertical-align: top; }
-  td:first-child { font-weight: 600; color: var(--ink); }
-  .badge { display: inline-block; font: 600 7.8pt Inter, sans-serif; padding: 2pt 7pt; border-radius: 999px; white-space: nowrap; }
-  .auto { background: #dff7f3; color: #0f766e; }
-  .rec { background: #e6eefb; color: var(--atlantic); }
-  .human { background: #fdf3dc; color: #92600a; }
-
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14pt; }
-  .checks { list-style: none; padding: 0; margin: 6pt 0 0; font-size: 9.2pt; }
-  .checks li { padding: 5pt 0 5pt 20pt; position: relative; border-bottom: 1px solid var(--line); }
-  .checks li::before {
-    content: ""; position: absolute; left: 2pt; top: 9pt; width: 9pt; height: 9pt; border-radius: 3px;
-    background: var(--teal); box-shadow: inset 0 0 0 2px #fff, 0 0 0 1px var(--teal);
-  }
-  .deferred { display: flex; flex-wrap: wrap; gap: 5pt; margin-top: 8pt; }
-  .deferred span { font-size: 8.3pt; border: 1px solid var(--line); border-radius: 999px; padding: 3pt 9pt; color: #475569; }
-
-  .closing { background: var(--night); color: #cbd5e1; border-radius: 12px; padding: 16pt 18pt; margin-top: 18pt; }
-  .closing h3 { color: #fff; font-size: 13pt; }
-  .closing p { margin: 6pt 0 0; font-size: 9.5pt; }
-  .closing a { color: var(--teal); text-decoration: none; font-weight: 600; }
-
-  @page { size: Letter; margin: 0; }
+  @page { size: Letter; margin: 0.55in 0.6in; }
   @media print {
-    body { background: none; }
-    .page { margin: 0; box-shadow: none; width: 8.5in; height: 11in; min-height: 11in; }
+    body { background: #fff; }
+    .doc { margin: 0; padding: 0; max-width: none; box-shadow: none; }
   }
-  @media screen and (max-width: 860px) {
-    .page { width: auto; min-height: 0; margin: 0; padding: 32px 16px 64px; box-shadow: none; }
-    .kpis, .tiers, .vectors, .timeline, .grid2, .cover-stats { grid-template-columns: 1fr; }
-    .cover h1 { font-size: 30pt; }
-    .cover .pill { margin-top: 48px; }
+  @media screen and (max-width: 760px) {
+    .doc { margin: 0; padding: 20px 16px; }
+    .two { grid-template-columns: 1fr; }
     table { display: block; overflow-x: auto; }
-    .footer { position: static; margin-top: 24px; }
   }
 </style>
 </head>
 <body>
+<main class="doc">
 
-<!-- 1. Cover -->
-<section class="page cover">
-  <div class="brand">
-    <img src="https://atlantiumai.io/assets/Circuit_Emblem_with_Gradient_Accent_Cropped-removebg-preview_1756327886569-BO1xM7Y2.png" alt="Atlantium AI">
-    <span>Atlantium AI</span>
-  </div>
-  <div class="pill">Agentic Defence Framework · Executive Plan</div>
-  <h1>Machine-speed <em>containment</em><br>in 90 days</h1>
-  <p class="sub">A 30/60/90-day plan to detect, contain and investigate AI-driven attacks before they become incidents, using the security tools you already own.</p>
-  <div class="cover-stats">
-    <div><b>8</b><span>attack patterns contained automatically, in seconds</span></div>
-    <div><b>&lt; 5 min</b><span>from alert to AI-assisted investigation</span></div>
-    <div><b>~55–60%</b><span>of intrusions stopped at machine speed (modeled)</span></div>
-  </div>
-  <div class="cover-foot"><span>Prepared by <b>Atlantium AI</b> · atlantiumai.io</span><span>October 2026</span></div>
-</section>
+<div class="masthead">
+  <div class="brand"><img src="https://atlantiumai.io/assets/Circuit_Emblem_with_Gradient_Accent_Cropped-removebg-preview_1756327886569-BO1xM7Y2.png" alt="">Atlantium AI</div>
+  <div class="meta">90-Day Containment Plan · v1.0 · October 2026<br>atlantiumai.io</div>
+</div>
 
-<!-- 2. Executive summary -->
-<section class="page">
-  <span class="eyebrow">Executive summary</span>
-  <h2>Attackers now move at machine speed. Our response has to as well.</h2>
-  <p class="lede" style="margin-top:8pt">AI-driven attackers can go from first access to impact in minutes. CrowdStrike's fastest observed eCrime breakout time is 27 seconds. When every containment decision waits for a person, defenders lose that race by design.</p>
-  <p>This plan pre-approves a small set of <strong>reversible</strong> containment actions, fired automatically by <strong>high-confidence</strong> detections, on <strong>low-risk targets</strong> first. An <strong>AI triage agent</strong> investigates everything else in minutes. It runs on tools you already own: EDR, SIEM, identity provider, cloud consoles and an automation platform.</p>
+<!-- ============ CISO SUMMARY ============ -->
+<span class="label">For the CISO</span>
+<h1 style="margin-bottom:6pt">Automated containment for AI-speed attacks in 90 days</h1>
 
-  <div class="kpis">
-    <div class="kpi"><b>8</b><span>attack patterns contained automatically by day 90</span></div>
-    <div class="kpi"><b>&lt; 5 min</b><span>alert to agent investigation and recommendation</span></div>
-    <div class="kpi"><b>&lt; 5 min</b><span>detect-to-contain target, proven by simulation</span></div>
-    <div class="kpi"><b>~55–60%</b><span>intrusions stopped at machine speed, vs. ~10–20% typical today</span></div>
-  </div>
-  <p class="note">Impact figures are modeled estimates from initial-access mix and coverage; the day-90 simulated attack replaces them with measured results.</p>
+<div class="box">
+  <p><strong>Decision needed:</strong> approve a written policy that lets automation contain a short list of near-certain attacks on low-risk targets without waiting for an analyst. Sign by day 30.</p>
+</div>
 
-  <div class="section">
-    <span class="eyebrow">How attacks get in</span>
-    <h2>Three ways in, one response rule</h2>
-    <div class="vectors">
-      <div class="vector"><span class="k">Pulled in</span><h3>Brought in by a user or AI agent</h3><p>Phishing, downloads, fake fixes, a prompt-injected AI agent. Starts on workstations.</p></div>
-      <div class="vector"><span class="k">Pushed in</span><h3>Exploited from the internet</h3><p>VPNs, firewalls, web apps. The top breach vector. Starts on servers and edge devices.</p></div>
-      <div class="vector"><span class="k">Walked in</span><h3>Valid access, misused</h3><p>Stolen passwords and sessions, MFA abuse, vendor access. Starts in the identity provider.</p></div>
-    </div>
-    <div class="callout"><p><strong>Once inside, attackers get the keys, blind the guards, move, then cash out.</strong> Our rule is simple: <strong>cut off whatever they're using.</strong> If it's a host, isolate it. If it's an identity, kill its sessions. If it's a cloud key, revoke it.</p></div>
-  </div>
+<p><strong>Problem.</strong> AI-assisted attackers reach lateral movement in minutes (fastest observed eCrime breakout: 27 seconds, CrowdStrike). When every containment needs an analyst decision, response arrives after the damage.</p>
 
-  <div class="footer"><span><b>Atlantium AI</b> · Machine-speed containment in 90 days</span><span>atlantiumai.io · 2</span></div>
-</section>
+<p><strong>What changes by day 90.</strong></p>
+<ul>
+  <li><strong>9 detections contain automatically</strong> on workstations, standard users and human cloud accounts: decoy and canary hits, credential theft, MFA fatigue, machine-speed reconnaissance, ransomware preparation, cloud logging disabled, stolen cloud credentials, and EDR tampering confirmed by a second signal.</li>
+  <li><strong>All other high-severity alerts</strong> get an AI-agent investigation and recommendation in under 5 minutes. Analysts still decide.</li>
+  <li><strong>Exposure reduced:</strong> phishing-resistant MFA for all admins, edge device management off the internet, actively exploited vulnerabilities on exposed systems patched within 72 hours.</li>
+</ul>
 
-<!-- 3. Approach and automation -->
-<section class="page">
+<p><strong>What could go wrong, and the control.</strong></p>
+<table>
+  <thead><tr><th>Risk</th><th>Control</th></tr></thead>
+  <tbody>
+    <tr><td>Automation isolates the wrong target</td><td>Low-risk targets only; critical systems and accounts go to a human. 2 weeks recommend-only first. One-click undo.</td></tr>
+    <tr><td>Bad rule or vendor outage causes mass action</td><td>Rate limits stop automation and page on-call; circuit breaker pauses it if many EDR sensors fail at once.</td></tr>
+    <tr><td>An attacker triggers our automation against us</td><td>Mass decoy hits become one investigation, not mass isolation. Text planted for the AI agent never triggers containment.</td></tr>
+    <tr><td>The AI agent makes a bad call</td><td>Recommend-only until ≥ 95% agreement with analysts over 30+ cases, zero harmful calls, per action type.</td></tr>
+    <tr><td>Users don't know why they were cut off</td><td>Every action logged; help desk answers "did security do this to me?" in under a minute.</td></tr>
+  </tbody>
+</table>
+
+<div class="two">
   <div>
-    <span class="eyebrow">The approach</span>
-    <h2>Three tiers of response</h2>
-    <div class="tiers">
-      <div class="tier t0"><span class="tag">Foundations</span><h3>Permission and visibility</h3><p>A signed containment policy, every asset and identity tagged with what automation may do, critical logs flowing, and a log of every action taken.</p></div>
-      <div class="tier t1"><span class="tag">Tier 1 · Automated</span><h3>Contain in seconds</h3><p>Near-certain detections trigger reversible actions automatically, on low-risk targets only, after two weeks in recommend-only mode.</p></div>
-      <div class="tier t2"><span class="tag">Tier 2 · AI triage</span><h3>Investigate in minutes</h3><p>An AI agent investigates everything else and recommends. It earns autonomy one action at a time, at ≥ 95% agreement with analysts.</p></div>
-    </div>
-  </div>
-  <div class="section">
-    <span class="eyebrow">Automation at day 90</span>
-    <h2>What runs on its own, and what doesn't</h2>
+    <p><strong>What we need from you</strong></p>
     <table>
-      <thead><tr><th>Detection</th><th>Response</th><th>Day 90</th></tr></thead>
       <tbody>
-        <tr><td>Decoy, fake credential or decoy account touched</td><td>Isolate machine, sign the user out everywhere</td><td><span class="badge auto">Automatic</span></td></tr>
-        <tr><td>Credential theft on a machine</td><td>Isolate, sign out, reset credentials, block attacker sites</td><td><span class="badge auto">Automatic</span></td></tr>
-        <tr><td>MFA fatigue, then an approval</td><td>Sign out everywhere, reset password and MFA</td><td><span class="badge auto">Automatic</span></td></tr>
-        <tr><td>Machine-speed reconnaissance</td><td>Isolate workstation, sign the session out</td><td><span class="badge auto">Automatic</span></td></tr>
-        <tr><td>Ransomware preparation</td><td>Isolate, disable the user, block attacker sites</td><td><span class="badge auto">Automatic</span></td></tr>
-        <tr><td>Cloud logging or security tools turned off</td><td>Turn them back on, revoke the actor's cloud access</td><td><span class="badge auto">Automatic</span></td></tr>
-        <tr><td>Stolen cloud credentials in use</td><td>Revoke active cloud sessions, page on-call</td><td><span class="badge auto">Automatic</span></td></tr>
-        <tr><td>Security tool tampering + a second signal</td><td>Sign out, attempt isolation, page on-call</td><td><span class="badge auto">Automatic</span></td></tr>
-        <tr><td>Everything else serious</td><td>AI agent investigates and recommends; analyst decides</td><td><span class="badge rec">Recommend</span></td></tr>
-        <tr><td>Critical servers, executives, service accounts, root and break-glass</td><td>Page a human immediately</td><td><span class="badge human">Human only</span></td></tr>
+        <tr><td>Sign the containment policy</td><td>Day 30</td></tr>
+        <tr><td>Mandate phishing-resistant MFA for admins</td><td>Day 1</td></tr>
+        <tr><td>Network team: edge management off the internet</td><td>Days 1–30</td></tr>
+        <tr><td>App owners: 15 min each to approve server isolation</td><td>Days 31–60</td></tr>
+        <tr><td>API access for agents and the automation platform</td><td>Day 1</td></tr>
       </tbody>
     </table>
   </div>
-  <div class="footer"><span><b>Atlantium AI</b> · Machine-speed containment in 90 days</span><span>atlantiumai.io · 3</span></div>
-</section>
-
-<!-- 4. The plan -->
-<section class="page">
-  <span class="eyebrow">The 30 / 60 / 90 day plan</span>
-  <h2>From permission to proven, in three phases</h2>
-  <p class="lede" style="margin-top:6pt">Phases are balanced by effort. The first month is light on engineering because signatures, owners and inventories take calendar time.</p>
-  <div class="timeline">
-    <div class="phase">
-      <header><small>Days 1–30</small><h3>See and authorize</h3></header>
-      <ul>
-        <li>Containment policy signed by leadership</li>
-        <li>Every workstation marked safe to auto-isolate; servers default to page-a-human</li>
-        <li>Action log live: the help desk can answer "did security do this to me?"</li>
-        <li>Critical logs confirmed flowing</li>
-        <li>Internet-facing systems inventoried; edge management taken off the internet</li>
-        <li>Decoy files, fake credentials and decoy accounts deployed</li>
-        <li>Read-only AI agent reports blind spots</li>
-      </ul>
-      <div class="exit"><b>Exit:</b> policy signed, workstations tagged, first blind spot report delivered</div>
-    </div>
-    <div class="phase">
-      <header><small>Days 31–60</small><h3>Build actions, learn the noise</h3></header>
-      <ul>
-        <li>Response actions built and tested with one-click undo: isolate, stop a process, block a site, sign out everywhere, disable, reset credentials</li>
-        <li>EDR in block mode everywhere, coverage gaps closed</li>
-        <li>Decoys go fully automatic</li>
-        <li>Other detections run in recommend-only mode</li>
-        <li>AI triage agent writes up every high-severity alert, risky sign-in and new MFA registration</li>
-      </ul>
-      <div class="exit"><b>Exit:</b> every action proven, decoys automatic, every high alert investigated in minutes</div>
-    </div>
-    <div class="phase">
-      <header><small>Days 61–90</small><h3>Cloud, edge, go automatic</h3></header>
-      <ul>
-        <li>Azure and AWS: disabled logging restored automatically, stolen cloud credentials cut off</li>
-        <li>Edge device admin and config changes investigated</li>
-        <li>Detections with a clean record go automatic for low-risk targets</li>
-        <li>Phishing-resistant MFA for every admin</li>
-        <li>Safe simulated attack measures detect-to-contain</li>
-      </ul>
-      <div class="exit"><b>Exit:</b> 8 detections automatic, time to contain measured, board scorecard</div>
-    </div>
-  </div>
-
-  <div class="footer"><span><b>Atlantium AI</b> · Machine-speed containment in 90 days</span><span>atlantiumai.io · 4</span></div>
-</section>
-
-<!-- 5. Safety and cloud -->
-<section class="page">
-  <span class="eyebrow">Safety by design</span>
-  <h2>Automation that can't take the business down</h2>
-  <div class="grid2" style="margin-top:6pt">
-    <ul class="checks">
-      <li><strong>Recommend first.</strong> Nothing acts on its own until it has run two clean weeks in recommend-only mode.</li>
-      <li><strong>Low-risk targets only.</strong> Workstations, standard users and human cloud accounts. Critical systems always go to a person.</li>
-      <li><strong>One-click undo and bulk undo</strong> on every action, plus rate limits that page on-call when hit.</li>
-      <li><strong>A full action log</strong>, so anyone can find out in a minute whether security acted on them, and why.</li>
-    </ul>
-    <ul class="checks">
-      <li><strong>Our tools can't cause an outage.</strong> A circuit breaker pauses automation during an EDR vendor outage, and tampering alerts need a second signal.</li>
-      <li><strong>Attackers can't turn it against us.</strong> Mass decoy hits become one investigation, not mass isolation.</li>
-      <li><strong>Prompt injection never triggers containment.</strong> Text planted for our AI agent goes to an analyst, not to an action.</li>
-      <li><strong>The AI earns autonomy</strong> one action at a time: ≥ 95% agreement with analysts, zero harmful calls.</li>
-    </ul>
-  </div>
-
-  <div class="section">
-    <span class="eyebrow">Cloud, safely</span>
-    <h2>Matching the action to the identity</h2>
+  <div>
+    <p><strong>How we'll measure it</strong></p>
     <table>
-      <thead><tr><th>Cloud identity</th><th>Automatic</th><th>Recommended</th></tr></thead>
       <tbody>
-        <tr><td>People (users, human roles)</td><td>Revoke sessions, deactivate keys, deny-all policy</td><td>—</td></tr>
-        <tr><td>Workloads (apps, CI/CD, services)</td><td>Revoke active sessions: workloads get fresh credentials, the attacker's copy dies</td><td>Deactivate keys, deny-all</td></tr>
-        <tr><td>Root, break-glass, org admin, security tooling</td><td>—</td><td><span class="badge human">Human only</span></td></tr>
-        <tr><td>Anyone who turned logging off</td><td>Logging restored, always</td><td>—</td></tr>
+        <tr><td>Detect-to-contain, simulated attack</td><td>&lt; 5 min</td></tr>
+        <tr><td>Alert to agent investigation</td><td>&lt; 5 min</td></tr>
+        <tr><td>Detections containing automatically</td><td>9</td></tr>
+        <tr><td>EDR coverage in block mode</td><td>&gt; 95%</td></tr>
+        <tr><td>Admins on phishing-resistant MFA</td><td>100%</td></tr>
+        <tr><td>Edge management exposed to internet</td><td>0</td></tr>
       </tbody>
     </table>
   </div>
+</div>
 
-  <div class="section">
-    <span class="eyebrow">Deliberately deferred to next quarter</span>
-    <div class="deferred">
-      <span>AI agent kill switch</span><span>Phishing response automation</span><span>Network-level quarantine</span>
-      <span>Cloud server isolation</span><span>SaaS-level detections</span><span>Data-theft analytics</span>
-      <span>Threat hunting</span><span>Hypervisor monitoring</span>
-    </div>
-    <p class="note" style="margin-top:6pt">These are the expensive 20%. They return next quarter with 90 days of data behind them.</p>
-  </div>
+<p class="small"><strong>Cost:</strong> existing EDR, SIEM, identity provider and automation platform; no new tooling assumed. Main cost is engineering time. <strong>Next quarter, not in scope:</strong> AI agent kill switch, phishing automation, network-layer quarantine, cloud server isolation, SaaS detections, data-theft detection, threat hunting, hypervisor monitoring.</p>
 
-  <div class="footer"><span><b>Atlantium AI</b> · Machine-speed containment in 90 days</span><span>atlantiumai.io · 5</span></div>
-</section>
+<!-- ============ ENGINEER SECTIONS ============ -->
+<div class="break"></div>
+<span class="label">For engineering</span>
+<h1>Implementation detail</h1>
+<p class="section-intro">IDs (e.g. A-03) map to <code>catalog/capabilities.yaml</code> in the framework repo, which holds the full spec for each item.</p>
 
-<!-- 6. Asks, metrics, closing -->
-<section class="page">
-  <span class="eyebrow">Making it happen</span>
-  <h2 style="margin-bottom:12pt">What we need, and how you'll know it worked</h2>
-  <div class="grid2">
-    <div>
-      <span class="eyebrow">What we need from leadership</span>
-      <table>
-        <tbody>
-          <tr><td>Sign the containment policy</td><td>Day 30</td></tr>
-          <tr><td>Mandate phishing-resistant MFA for admins</td><td>Day 1</td></tr>
-          <tr><td>Edge device management off the internet</td><td>Days 1–30</td></tr>
-          <tr><td>15 minutes per app owner: "can we isolate this server?"</td><td>Days 31–60</td></tr>
-          <tr><td>Read-only API access for agents; automation platform access</td><td>Day 1</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div>
-      <span class="eyebrow">How you'll know it worked</span>
-      <table>
-        <tbody>
-          <tr><td>EDR coverage in block mode</td><td>&gt; 95%</td></tr>
-          <tr><td>Attack patterns contained automatically</td><td>8</td></tr>
-          <tr><td>Alert to investigation</td><td>&lt; 5 min</td></tr>
-          <tr><td>Detect-to-contain (simulation)</td><td>&lt; 5 min</td></tr>
-          <tr><td>Admins on phishing-resistant MFA</td><td>100%</td></tr>
-          <tr><td>Edge management exposed to internet</td><td>0</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+<h2>1. Phase checklist</h2>
+<h3>Days 1–30: authorize and see</h3>
+<table>
+  <thead><tr><th>Item</th><th>Done when</th><th>ID</th></tr></thead>
+  <tbody>
+    <tr><td class="k">Containment policy</td><td>Signed; lists each automated action and the asset/identity tiers it applies to</td><td class="id">F-01</td></tr>
+    <tr><td class="k">Asset tiers</td><td>All workstations tagged A in the EDR; untagged servers default to B</td><td class="id">F-02</td></tr>
+    <tr><td class="k">Identity tiers</td><td>Exclusion group exists for tier C (break-glass, service, sync, cloud admin, automation roles); automation reads it</td><td class="id">F-03</td></tr>
+    <tr><td class="k">Action log</td><td>Help desk can look up any user/host and see every action, trigger, state and undo step</td><td class="id">F-12</td></tr>
+    <tr><td class="k">Must-have logs</td><td>All sources in section 6 flowing, lag &lt; 5 min on a dashboard, silence alert per source</td><td class="id">F-06</td></tr>
+    <tr><td class="k">Exposure inventory</td><td>Internet-facing services listed with owners; known-exploited vulns tracked to 72 h SLA</td><td class="id">F-09</td></tr>
+    <tr><td class="k">Edge lockdown</td><td>No edge management interface reachable from the internet; VPN requires SSO + MFA</td><td class="id">H-08</td></tr>
+    <tr><td class="k">Decoys and canaries</td><td>Decoys on all servers and a workstation sample, canary AD user + SPN, recommend-only</td><td class="id">A-01, A-02</td></tr>
+    <tr><td class="k">Admin MFA rollout</td><td>Phishing-resistant MFA rollout started for privileged accounts</td><td class="id">H-01</td></tr>
+    <tr><td class="k">Blind spot agent</td><td>Daily read-only report: silent sources, unmanaged hosts, stale tables</td><td class="id">agents/</td></tr>
+  </tbody>
+</table>
 
-  <div class="section">
-    <span class="eyebrow">The finish line</span>
-    <h2>"Basics done" means yes to all of these</h2>
-    <div class="grid2">
-      <ul class="checks">
-        <li>Automated containment is pre-approved in writing</li>
-        <li>Every host, identity and cloud account is tagged with what automation may do</li>
-        <li>EDR blocks on &gt; 95% of hosts and critical logs are flowing</li>
-        <li>Every action has undo, rate limits and a searchable log</li>
-      </ul>
-      <ul class="checks">
-        <li>Decoys contain whoever touches them</li>
-        <li>Eight attack patterns are contained in seconds</li>
-        <li>Edge devices are locked down and patched within 72 hours</li>
-        <li>Everything else gets an AI investigation in under 5 minutes</li>
-      </ul>
-    </div>
+<h3>Days 31–60: build actions, learn noise</h3>
+<table>
+  <thead><tr><th>Item</th><th>Done when</th><th>ID</th></tr></thead>
+  <tbody>
+    <tr><td class="k">Action safety</td><td>Tier check at run time, undo + bulk undo, rate limits per rule and action type paging P1, all writes to action log</td><td class="id">F-04</td></tr>
+    <tr><td class="k">Six actions</td><td>Isolate host, kill process, network block, revoke sessions, disable account, reset password + MFA: each run and undone on a test target</td><td class="id">ACT-*</td></tr>
+    <tr><td class="k">EDR posture</td><td>&gt; 95% coverage, prevent mode, anti-tamper, broad exclusions reviewed</td><td class="id">F-05</td></tr>
+    <tr><td class="k">Decoys to auto</td><td>2 clean weeks, mass-hit breaker in place</td><td class="id">A-01, A-02</td></tr>
+    <tr><td class="k">Tier 1 in recommend</td><td>Credential theft, MFA fatigue, recon burst, ransomware precursors producing recommendations</td><td class="id">A-03, A-06, A-13, A-15</td></tr>
+    <tr><td class="k">Triage agent</td><td>Write-up on every EDR high/critical, risky sign-in, new MFA method, server shell</td><td class="id">D-01–D-04</td></tr>
+    <tr><td class="k">Tuning</td><td>Exceptions drafted narrowly with owner and expiry from day 31</td><td class="id">agents/</td></tr>
+    <tr><td class="k">Server tiers</td><td>Owners answered the isolate question; no answer = stays B</td><td class="id">F-02</td></tr>
+  </tbody>
+</table>
+
+<h3>Days 61–90: cloud, edge, go automatic</h3>
+<table>
+  <thead><tr><th>Item</th><th>Done when</th><th>ID</th></tr></thead>
+  <tbody>
+    <tr><td class="k">Cloud actions</td><td>Revoke cloud credentials (tier-aware) and restore logging tested in each cloud</td><td class="id">ACT-06, ACT-12</td></tr>
+    <tr><td class="k">Cloud detections</td><td>Logging disabled, creds used outside provider / unused region, new privilege or root/break-glass use</td><td class="id">A-08, A-12, D-06</td></tr>
+    <tr><td class="k">Edge monitoring</td><td>Edge admin sign-ins and config changes in SIEM, routed to triage</td><td class="id">D-12</td></tr>
+    <tr><td class="k">EDR tampering</td><td>Corroboration rule and circuit breaker tested</td><td class="id">A-04</td></tr>
+    <tr><td class="k">AI agent inventory</td><td>Agents that can write or execute listed with identity, owner and logs</td><td class="id">F-10</td></tr>
+    <tr><td class="k">Admin MFA</td><td>100% of privileged accounts phishing-resistant</td><td class="id">H-01</td></tr>
+    <tr><td class="k">Graduation</td><td>Rules passing graduation criteria (section 4) switched to auto for tier A</td><td class="id">—</td></tr>
+    <tr><td class="k">Simulation</td><td>Decoy read, credential theft, recon burst, MFA burst, cloud trail disable; detect-to-contain recorded</td><td class="id">F-08</td></tr>
+  </tbody>
+</table>
+
+<h2>2. Detections</h2>
+<p class="section-intro">"Auto" applies to tier A targets only. Tier B gets kill process / network block / revoke + page. Tier C always pages.</p>
+<table>
+  <thead><tr><th>Detection</th><th>Trigger</th><th>Needs</th><th>Response</th><th>Day 90</th></tr></thead>
+  <tbody>
+    <tr><td class="k">Decoy / canary credential<br><span class="id">A-01</span></td><td>Read of a decoy file by a content-opening process, or use of an embedded canary credential</td><td>EDR file-read or object-access auditing</td><td>Isolate host, revoke reader's sessions</td><td class="auto">Auto</td></tr>
+    <tr><td class="k">Canary AD account<br><span class="id">A-02</span></td><td>Any auth attempt or Kerberos service ticket request for a canary user/SPN</td><td>DC security logs</td><td>Isolate source host</td><td class="auto">Auto</td></tr>
+    <tr><td class="k">Credential theft<br><span class="id">A-03</span></td><td>EDR high-confidence: LSASS dump (incl. comsvcs), SAM/SYSTEM hive save, DCSync from non-DC, browser credential theft</td><td>EDR</td><td>Isolate, revoke sessions of logged-on users, reset creds, block C2</td><td class="auto">Auto</td></tr>
+    <tr><td class="k">MFA fatigue<br><span class="id">A-06</span></td><td>N denied/ignored pushes in a short window, then approval from new IP/device</td><td>IdP sign-in + MFA events</td><td>Revoke sessions, remove MFA methods added in 24 h, reset</td><td class="auto">Auto</td></tr>
+    <tr><td class="k">Recon burst<br><span class="id">A-13</span></td><td>≥ N distinct discovery commands in 60 s from one process tree (Windows and Linux lists; metadata endpoint from shells)</td><td>EDR process telemetry</td><td>Isolate workstation, revoke session; servers → triage</td><td class="auto">Auto (workstations)</td></tr>
+    <tr><td class="k">Ransomware precursors<br><span class="id">A-15</span></td><td>Shadow copy/backup deletion, recovery disabled, mass stop of security/backup/DB services</td><td>EDR</td><td>Isolate, disable user, network block</td><td class="auto">Auto</td></tr>
+    <tr><td class="k">Logging disabled<br><span class="id">A-08</span></td><td>Cloud trail stopped/deleted/updated, diagnostic settings removed, threat detection disabled, security log cleared</td><td>Cloud control plane, DC/host logs</td><td>Restore logging (always), revoke actor's cloud creds per tier</td><td class="auto">Auto</td></tr>
+    <tr><td class="k">Stolen cloud creds<br><span class="id">A-12</span></td><td>Threat-detection finding: workload creds used outside provider, or activity in unused region/account</td><td>GuardDuty / Defender for Cloud</td><td>Revoke active sessions on the role, page</td><td class="auto">Auto</td></tr>
+    <tr><td class="k">EDR tampering + 2nd signal<br><span class="id">A-04</span></td><td>Tamper alert, sensor stop, vulnerable driver, or sensor silent while host is on network, plus another detection on same host/user within 60 min</td><td>EDR health, DHCP/DNS/IdP device logs</td><td>Revoke sessions, attempt isolation, page</td><td class="auto">Auto if graduated</td></tr>
+    <tr><td class="k">EDR tampering alone</td><td>Any of the above without corroboration</td><td>as above</td><td>Triage agent decides</td><td class="rec">Recommend</td></tr>
+    <tr><td class="k">EDR high/critical<br><span class="id">D-01</span></td><td>Any EDR high/critical not covered above</td><td>EDR</td><td>Agent investigates, recommends</td><td class="rec">Recommend</td></tr>
+    <tr><td class="k">Risky sign-in<br><span class="id">D-02</span></td><td>IdP risk detection, new device + new ISP, token replay, anonymizing infrastructure</td><td>IdP sign-in + risk</td><td>Agent recommends revoke/reset</td><td class="rec">Recommend</td></tr>
+    <tr><td class="k">New MFA method / reset<br><span class="id">D-03</span></td><td>MFA registered from unseen device/IP, or help-desk reset then new-device sign-in within 24 h</td><td>IdP audit</td><td>Agent recommends remove method, revoke</td><td class="rec">Recommend</td></tr>
+    <tr><td class="k">Server spawns shell<br><span class="id">D-04</span></td><td>Web/app/DB process spawning cmd, PowerShell, sh/bash; new script in web dir</td><td>EDR</td><td>Agent recommends isolate/kill/block</td><td class="rec">Recommend</td></tr>
+    <tr><td class="k">New privilege<br><span class="id">D-06</span></td><td>New admin role, OAuth consent, SP secret, cloud key/admin policy, federation change; root or break-glass use = P1</td><td>IdP audit, cloud control plane</td><td>Agent recommends revert + revoke actor</td><td class="rec">Recommend</td></tr>
+    <tr><td class="k">Edge admin/config change<br><span class="id">D-12</span></td><td>New edge admin, admin sign-in from outside mgmt network, config/firmware change without ticket</td><td>Edge device logs</td><td>Agent recommends disable admin, block IP</td><td class="rec">Recommend</td></tr>
+    <tr><td class="k">Prompt injection in evidence</td><td>Instructions aimed at an AI/analyst found in alert data</td><td>—</td><td>Raise severity, human + research decide; never contain on this alone</td><td class="hum">Human</td></tr>
+  </tbody>
+</table>
+
+<h2>3. Response actions</h2>
+<table>
+  <thead><tr><th>Action</th><th>What it does</th><th>Undo</th><th>Auto scope at day 90</th></tr></thead>
+  <tbody>
+    <tr><td class="k">Isolate host (EDR)</td><td>Network containment, EDR channel kept open</td><td>Release</td><td>Tier A hosts</td></tr>
+    <tr><td class="k">Kill process</td><td>Terminate tree, quarantine binary</td><td>Restore file</td><td>Tier A/B hosts</td></tr>
+    <tr><td class="k">Network block</td><td>Domain/IP/URL at DNS, firewall/proxy, email gateway; hash in EDR</td><td>Remove block</td><td>New/rare indicators; never business-critical domains or shared IPs</td></tr>
+    <tr><td class="k">Revoke sessions</td><td>Kill IdP sessions and refresh tokens (assumes SaaS via SSO; verify top apps honor it)</td><td>User signs in again</td><td>Tier A identities</td></tr>
+    <tr><td class="k">Disable account</td><td>Disable in source of truth; always paired with revoke (issued tokens outlive a disable)</td><td>Re-enable</td><td>Tier A humans</td></tr>
+    <tr><td class="k">Reset password + MFA</td><td>Force reset, remove recently added MFA methods; re-enroll via help desk</td><td>Help desk re-enroll</td><td>Tier A identities</td></tr>
+    <tr><td class="k">Revoke cloud creds</td><td>(1) revoke active sessions, (2) deactivate key, (3) deny-all policy</td><td>Detach / reactivate</td><td>Humans: 1–3. Workloads: 1 only. Tier C: none</td></tr>
+    <tr><td class="k">Restore cloud logging</td><td>Re-enable trail, diagnostic settings, threat detection</td><td>n/a</td><td>Always</td></tr>
+  </tbody>
+</table>
+
+<h2>4. Safety mechanics</h2>
+<table>
+  <thead><tr><th>Control</th><th>Setting</th></tr></thead>
+  <tbody>
+    <tr><td class="k">Recommend period</td><td>Every rule ≥ 2 weeks recommend-only on real traffic before auto</td></tr>
+    <tr><td class="k">Rule graduation</td><td>Projected ≤ 1 false positive/month (or each covered by a narrow exception); action tested; fired at least once (real or simulated); listed in the signed policy</td></tr>
+    <tr><td class="k">Agent graduation</td><td>Per action type and tier: ≥ 30 reviewed recommendations, ≥ 95% agreement, zero harmful, passes prompt-injection test set</td></tr>
+    <tr><td class="k">Rate limits</td><td>Per rule and per action type (isolate, disable, revoke, block). Hitting a limit stops automation and pages P1</td></tr>
+    <tr><td class="k">EDR circuit breaker</td><td>&gt; ~2% of sensors (or N hosts) silent within an hour → infrastructure incident, no automated action</td></tr>
+    <tr><td class="k">Decoy mass-hit breaker</td><td>Decoys tripped on &gt; 3 hosts within 15 min → stop per-host containment, one P1 incident, find shared source</td></tr>
+    <tr><td class="k">Decoy read filter</td><td>Count shells, script engines, editors, archivers, AI agent processes; exclude backup, AV, indexer, Explorer preview/thumbnail</td></tr>
+    <tr><td class="k">Prompt injection</td><td>Containment targets come only from structured alert entities and independent telemetry, never free text</td></tr>
+    <tr><td class="k">Missing data</td><td>Untagged host = B, untagged identity = B, stale table row = missing</td></tr>
+    <tr><td class="k">Exceptions</td><td>Narrowest match (hash + host + account first), owner, reason, expiry ≤ 12 months, human-approved</td></tr>
+    <tr><td class="k">Action log fields</td><td>Time, target, action, trigger (rule/agent/analyst), case link, state (active/undone), undo step</td></tr>
+  </tbody>
+</table>
+
+<h2>5. Tiers</h2>
+<table>
+  <thead><tr><th>Tier</th><th>Hosts</th><th>Identities</th><th>Cloud principals</th><th>Automation may</th></tr></thead>
+  <tbody>
+    <tr><td class="k">A</td><td>All workstations, non-prod servers</td><td>Standard users</td><td>Human users and roles</td><td>Run any action</td></tr>
+    <tr><td class="k">B</td><td>Servers (default), owner-confirmed prod</td><td>Executives, IT admins</td><td>Workload, CI/CD, service roles</td><td>Kill process, block, revoke sessions; page for the rest</td></tr>
+    <tr><td class="k">C</td><td>DCs, hypervisors, IdP/sync, PKI, security tools, backup, core network, OT</td><td>Break-glass, service, sync accounts</td><td>Root, org admin, security tooling, automation roles</td><td>Nothing. Page only</td></tr>
+  </tbody>
+</table>
+
+<h2>6. Logs</h2>
+<div class="two">
+  <div>
+    <p><strong>Must have (days 1–30)</strong></p>
+    <ul>
+      <li>EDR alerts and telemetry, sensor health, console audit</li>
+      <li>Decoy read auditing (EDR file reads or object-access SACL)</li>
+      <li>Second "host alive" source: DHCP, DNS or IdP device sign-ins</li>
+      <li>IdP sign-ins incl. MFA events, audit log, risk detections</li>
+      <li>Domain controller security logs</li>
+      <li>Edge device admin sign-ins and config changes</li>
+      <li>Cloud control plane and threat detection findings (if cloud)</li>
+    </ul>
   </div>
-  <div class="closing">
-    <h3>Get 80% of the protection for 20% of the effort, then build on it.</h3>
-    <p>Atlantium AI helps security teams adopt AI safely and defend against it. Learn more at <a href="https://atlantiumai.io">atlantiumai.io</a>.</p>
+  <div>
+    <p><strong>Collect now (by day 60)</strong></p>
+    <ul>
+      <li>DNS queries</li>
+      <li>Email gateway</li>
+      <li>VPN / remote access sign-ins</li>
+      <li>AI agent platform logs (agents that can write or execute)</li>
+      <li>Automation platform audit</li>
+    </ul>
+    <p class="small">All sources: &lt; 5 min ingest lag, silence alert, ≥ 90 days searchable.</p>
   </div>
-  <div class="footer"><span><b>Atlantium AI</b> · Machine-speed containment in 90 days</span><span>atlantiumai.io · 6</span></div>
-</section>
+</div>
+
+<h2>7. Data tables</h2>
+<table>
+  <thead><tr><th>Table</th><th>Built from</th><th>Refresh</th><th>If row missing</th></tr></thead>
+  <tbody>
+    <tr><td class="k">Asset tiers</td><td>EDR inventory + role signals; agent classifies servers; owners confirm</td><td>Daily</td><td>Tier B</td></tr>
+    <tr><td class="k">Identity tiers</td><td>IdP + HR + cloud IAM; agent flags non-human accounts</td><td>Daily</td><td>Tier B</td></tr>
+    <tr><td class="k">Exceptions</td><td>Agent drafts, human approves, script expires</td><td>Daily</td><td>No exception</td></tr>
+    <tr><td class="k">Decoy registry</td><td>Deployment script; weekly health check</td><td>Weekly</td><td>—</td></tr>
+    <tr><td class="k">Exposure inventory</td><td>External scan + cloud public IPs, joined with KEV</td><td>Weekly / KEV daily</td><td>Alert</td></tr>
+    <tr><td class="k">Cloud accounts and regions</td><td>Cloud org APIs; owner confirms region allowlist</td><td>Weekly</td><td>Region disallowed</td></tr>
+    <tr><td class="k">AI agent inventory</td><td>EDR, OAuth grants, agent platforms</td><td>Weekly</td><td>Unapproved</td></tr>
+  </tbody>
+</table>
+<p class="small">Scripts build, agents propose, humans approve, automation reads. Tightening may be automatic; loosening (tier C, new exception) needs a human. Every table alerts if it stops refreshing.</p>
+
+<h2>8. Edge devices</h2>
+<ol>
+  <li><strong>Inventory</strong> every exposed VPN, firewall, file transfer and remote access gateway: vendor, version, owner, what it authenticates against.</li>
+  <li><strong>Lock down:</strong> management off the internet, VPN via SSO + MFA, named admins only, unused portals off.</li>
+  <li><strong>Patch</strong> known-exploited vulnerabilities in ≤ 72 h, or mitigate / restrict / take offline with a signed exception.</li>
+  <li><strong>Assume compromise</strong> when a known-exploited bug hits an exposed device: run the vendor integrity checker, review admin accounts, config, files and VPN sessions since disclosure, reset credentials that passed through it (VPN users in the window, the device's LDAP account).</li>
+  <li><strong>Watch</strong> admin sign-ins, config/firmware changes and admin account changes; route to triage.</li>
+</ol>
+
+<h2>9. Agents</h2>
+<table>
+  <thead><tr><th>Agent</th><th>Starts</th><th>Does</th><th>Permission</th></tr></thead>
+  <tbody>
+    <tr><td class="k">Blind Spot Detector</td><td>Day 1</td><td>Silent log sources, unmanaged hosts, detect-only policies, stale tables</td><td>Read-only</td></tr>
+    <tr><td class="k">Triage</td><td>Day 31</td><td>Investigates alerts, classifies entry vector, runs blast-radius sweep, recommends actions</td><td>Recommend → auto per action type after graduation</td></tr>
+    <tr><td class="k">Data Steward</td><td>Day 31</td><td>Classifies unknown servers and accounts, drafts owner questions</td><td>Proposes table changes</td></tr>
+    <tr><td class="k">Alert Tuner</td><td>Day 31</td><td>Finds noise, drafts narrow exceptions, runs graduation reviews</td><td>Proposes exceptions</td></tr>
+  </tbody>
+</table>
+<p class="small">Skill packs, tool interface and permission ladder: <code>agents/</code> in the framework repo.</p>
+
+</main>
 </body>
 </html>

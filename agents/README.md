@@ -25,8 +25,8 @@ Markdown with a name and description, so it also works as prompt material for ot
 | When | Agents | Why |
 |---|---|---|
 | Days 1–30 | **Blind Spot Detector** (read-only) | No approvals needed; its first report sets the priorities |
-| Days 31–60 | **Triage** (recommend) + **Data Steward** (propose) | Every alert investigated; quarantine list and identity tiers filled in |
-| Days 61–90 | **Alert Tuner** | Graduates the first rules and agent actions to automatic |
+| Days 31–60 | **Triage** (recommend) + **Data Steward** (propose) + **Alert Tuner** (drafts exceptions) | Every alert investigated; quarantine list and identity tiers filled in; noise tuned during recommend-only |
+| Days 61–90 | **Alert Tuner** graduation reviews | Graduates the first rules and agent actions to automatic |
 | After 90 days | Threat Hunter, Researcher, Validator | The remaining 20%. Until then, triage handles research inline |
 
 ## How it fits together

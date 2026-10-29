@@ -75,7 +75,7 @@ Changes from the first draft: EDR prevent-mode enforcement moved to days 31–60
 - [ ] Safe attack simulation: decoy read, credential theft, recon burst, MFA burst, cloud trail disable. Measure detect-to-contain; target < 5 minutes
 - [ ] Executive scorecard
 
-**Exit:** 8 detections containing automatically · time to contain measured · scorecard delivered.
+**Exit:** 9 detections containing automatically · time to contain measured · scorecard delivered.
 
 ## Automation at day 90
 
@@ -131,7 +131,7 @@ Changes from the first draft: EDR prevent-mode enforcement moved to days 31–60
 | EDR coverage in prevent mode | measure | > 95% |
 | "Must have" log sources flowing | measure | 100% |
 | Hosts and identities with a containment tier | workstations | 100% (rest on safe defaults) |
-| Detections containing automatically | 0 | 8 |
+| Detections containing automatically | 0 | 9 |
 | Time from alert to triage write-up | measure | < 5 min |
 | Detect-to-contain in simulation | — | < 5 min |
 | Admins on phishing-resistant MFA | measure | 100% |
