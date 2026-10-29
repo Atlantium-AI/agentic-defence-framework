@@ -86,7 +86,7 @@ tables:
   name: Approved remote access, RMM and tunneling tools
   purpose: Anything not on this list triggers the unapproved remote access tool detection.
   priority: tier1-dependency
-  baseline: true
+  baseline: false
   used_by: [A-14, M-03]
   sources: [IT, EDR software inventory, procurement/contracts]
   script: Stack remote access tool executions fleet-wide and diff against the list.
@@ -100,7 +100,7 @@ tables:
   name: Network segments and quarantine paths
   purpose: Subnet to site/type mapping (workstation, server, DMZ, OT, VPN, guest), plus how to network-quarantine a host in each segment.
   priority: tier1-dependency
-  baseline: true
+  baseline: false
   used_by: [ACT-02, A-04, A-10, T-01]
   sources: [IPAM, DHCP scopes, firewall and NAC config, cloud VPC/VNet config]
   script: Pull DHCP scopes and cloud network ranges; flag IPs seen in telemetry that fall in no known segment.
@@ -128,7 +128,7 @@ tables:
   name: Privileged identities
   purpose: Every admin across AD, IdP, cloud, EDR, SIEM and SaaS, so a new one is a detection and an alert on one is higher priority.
   priority: tier2-context
-  baseline: true
+  baseline: false
   used_by: [D-06, H-01, H-06, M-01]
   sources: [AD privileged groups, IdP admin roles, cloud role assignments, EDR/SIEM console admins, key SaaS admin roles]
   script: Snapshot all privileged assignments daily; diff = new privilege alert.
@@ -213,7 +213,7 @@ tables:
   purpose: What is normal across the fleet (drivers, persistence entries, server outbound destinations, business file-sharing domains), so new things stand out.
   priority: later
   baseline: false
-  used_by: [D-05, D-08, D-10, A-16, I-04]
+  used_by: [D-05, D-08, A-16]
   sources: [EDR / Sysmon telemetry, DNS and proxy logs]
   script: Stack counts across the fleet weekly; anything seen on fewer than N hosts or new this week goes to the diff.
   agent: Triage the weekly diff (LOLDrivers, signer reputation, destination reputation).

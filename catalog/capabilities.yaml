@@ -124,7 +124,7 @@ capabilities:
   stage: any
   impact: M
   effort: L
-  baseline: true
+  baseline: false
   action: >
     Out-of-band channel (e.g. Signal group) for when email/Slack/Teams is compromised, and
     break-glass admin accounts for the IdP, EDR console and SIEM, stored offline and tested.
@@ -138,7 +138,7 @@ capabilities:
   stage: any
   impact: M
   effort: L
-  baseline: true
+  baseline: false
   action: >
     Run a small atomic test set (decoy file read, LSASS-access sim, Office spawning a
     script host, recon burst, MFA burst on a test user) and record the time from first event to containment.
@@ -183,7 +183,7 @@ capabilities:
   stage: any
   impact: H
   effort: M
-  baseline: true
+  baseline: false
   action: >
     Build and keep fresh the lookups automation reads at action time (asset and identity tiers,
     exceptions, canary registry, approved tools, network segments, and more). Scripts build, agents
@@ -214,7 +214,7 @@ capabilities:
   stage: guards
   impact: H
   effort: M
-  baseline: true
+  baseline: false
   action: >
     Quarantine that doesn't depend on the host's own agent: NAC/switch port, internal firewall
     or ZTNA block by IP/MAC, wireless de-auth, or cloud security group swap. Needed when EDR is
@@ -253,7 +253,7 @@ capabilities:
   stage: keys
   impact: H
   effort: L
-  baseline: true
+  baseline: false
   action: Force password reset and remove recently added MFA methods, with out-of-band re-enrollment through the help desk.
   done_when: Runs from automation; help desk re-enrollment procedure documented.
 
@@ -265,12 +265,12 @@ capabilities:
   stage: keys
   impact: H
   effort: M
-  baseline: true
+  baseline: false
   action: Attach a deny-all policy to the cloud principal, revoke active sessions, and deactivate its access keys/secrets.
   done_when: Tested against a test principal in each cloud the client uses.
 
 - id: ACT-07
-  name: Block IOC fleet-wide
+  name: Network block (domain, IP, URL)
   type: action
   tier: 0
   vectors: [pulled, pushed, post-access]
@@ -278,8 +278,11 @@ capabilities:
   impact: M
   effort: L
   baseline: true
-  action: Push a hash, domain, URL or IP block to EDR, DNS/proxy and email gateway in one step.
-  done_when: One call blocks a test domain across all three layers.
+  action: >
+    Block a malicious domain, IP or URL at DNS, proxy/firewall and email gateway in one step (plus
+    the file hash in the EDR). Stops command-and-control, payload downloads and exfil destinations
+    fleet-wide without touching any host or user.
+  done_when: One call blocks a test domain and IP across DNS, firewall/proxy and email, and one call removes the block.
 
 - id: ACT-08
   name: Purge email from all mailboxes
@@ -289,7 +292,7 @@ capabilities:
   stage: entry
   impact: M
   effort: L
-  baseline: true
+  baseline: false
   action: Find and remove a message (by sender, subject, URL or attachment hash) from every mailbox.
   done_when: Tested on a test message sent to several mailboxes.
 
@@ -301,7 +304,7 @@ capabilities:
   stage: any
   impact: H
   effort: M
-  baseline: true
+  baseline: false
   action: >
     On containment, pull a triage package (running processes, network connections, memory if
     feasible, key artifacts, autoruns) through the EDR or IR agent before anyone reboots or reimages.
@@ -364,7 +367,7 @@ capabilities:
   stage: keys
   impact: H
   effort: L
-  baseline: true
+  baseline: false
   trigger: Any authentication attempt or Kerberos service ticket request for a canary account.
   action: Contain the source host (tier-aware); open a P1.
   uses: [ACT-01, ACT-09]
@@ -384,7 +387,7 @@ capabilities:
     High-confidence EDR alerts for LSASS dumping (incl. comsvcs MiniDump), SAM/SYSTEM hive
     save, DCSync from a non-DC, browser credential store theft.
   action: Contain the host, revoke sessions for every user logged on to it, force password reset.
-  uses: [ACT-01, ACT-03, ACT-05, ACT-09]
+  uses: [ACT-01, ACT-03, ACT-05, ACT-07, ACT-09]
   guardrails: Allowlist sanctioned memory-dump tools by hash and signer; tier C gets block-lateral + page.
   done_when: Automation fires on the vendor's credential-theft alert categories; tested with a safe simulation.
 
@@ -400,8 +403,10 @@ capabilities:
   trigger: >
     EDR tamper alert, service stop, or a known-vulnerable driver load (LOLDrivers match).
     OR the sensor heartbeat is missing while the host is still seen on the network (DHCP/DNS/firewall/IdP).
-  action: Quarantine at a layer the attacker can't reach from the host; disable the logged-on user.
-  uses: [ACT-02, ACT-04]
+  action: >
+    Quarantine at a layer the attacker can't reach from the host; disable the logged-on user. Until
+    network-layer quarantine exists: try EDR isolation, disable the user, and page immediately.
+  uses: [ACT-01, ACT-02, ACT-04]
   guardrails: Suppress during planned maintenance windows and EDR upgrade waves.
   done_when: Heartbeat-gap rule exists and has a network-layer quarantine path for at least workstations.
 
@@ -413,7 +418,7 @@ capabilities:
   stage: entry
   impact: H
   effort: L
-  baseline: true
+  baseline: false
   trigger: Outlook/Word/Excel/PowerPoint/OneNote (or new Outlook's webview) spawning powershell, cmd, wscript, cscript, mshta, rundll32, regsvr32.
   action: Isolate the host, revoke the user's sessions, purge the email from all mailboxes.
   uses: [ACT-01, ACT-03, ACT-08, ACT-09]
@@ -458,7 +463,7 @@ capabilities:
   stage: guards
   impact: H
   effort: L
-  baseline: true
+  baseline: false
   trigger: Security log cleared, audit policy changed, cloud trail stopped/deleted/updated, cloud threat detection disabled, IdP log streaming changes.
   action: P1 page. In cloud, cut off the acting principal.
   uses: [ACT-06]
@@ -550,7 +555,7 @@ capabilities:
   stage: move
   impact: H
   effort: L
-  baseline: true
+  baseline: false
   trigger: >
     Execution or install of a remote access/RMM or tunneling tool not on the client's approved list
     (AnyDesk, ScreenConnect, TeamViewer, Atera, ngrok, cloudflared, Tailscale, Chisel, etc.).
@@ -570,7 +575,7 @@ capabilities:
   baseline: true
   trigger: Shadow copy deletion, backup catalog/job deletion, boot recovery disabled, mass stop of security/backup/database services, EDR ransomware behavior alerts.
   action: Isolate the host and disable the acting user immediately; page.
-  uses: [ACT-01, ACT-04, ACT-09]
+  uses: [ACT-01, ACT-04, ACT-07, ACT-09]
   guardrails: Allowlist the backup software's own maintenance jobs.
   done_when: Rule in auto mode; tested with a safe simulation.
 
@@ -582,7 +587,7 @@ capabilities:
   stage: cashout
   impact: H
   effort: L
-  baseline: true
+  baseline: false
   trigger: rclone, MEGAsync/megacmd, restic, WinSCP/curl/scp to file-sharing or cloud-storage domains not used by the business, run on a server.
   action: Kill the process, block the destination, contain the host (tier-aware).
   uses: [ACT-10, ACT-07, ACT-01]
@@ -605,7 +610,7 @@ capabilities:
   baseline: true
   trigger: EDR high/critical severity alert.
   action: Agent runs the host evidence pack and blast radius sweep, classifies pulled/pushed/walked, and recommends close/escalate/contain with evidence.
-  uses: [ACT-01, ACT-10]
+  uses: [ACT-01, ACT-07, ACT-10]
   done_when: Every high/critical alert gets an agent write-up within 5 minutes.
 
 - id: D-02
@@ -630,7 +635,7 @@ capabilities:
   stage: entry
   impact: H
   effort: L
-  baseline: true
+  baseline: false
   trigger: MFA method registered (especially from a never-seen device/IP), or a help desk reset followed by sign-in from a new device within 24h.
   action: Agent correlates with help desk ticket, prior device history and IP reputation; recommends removing the method and revoking sessions.
   uses: [ACT-03, ACT-05]
@@ -647,7 +652,7 @@ capabilities:
   baseline: true
   trigger: w3wp, httpd, nginx, java/tomcat, sqlservr, node, php spawning cmd/powershell/sh/bash, or a new script file written to a web directory.
   action: Agent pulls the process tree and web logs; recommends isolate (tier A/B) or kill process + page (tier C).
-  uses: [ACT-01, ACT-10, ACT-09]
+  uses: [ACT-01, ACT-07, ACT-10, ACT-09]
   done_when: Rule live with known-good app behavior allowlisted. Strong candidate for Tier 1 after tuning.
 
 - id: D-05
@@ -662,7 +667,7 @@ capabilities:
   trigger: New service, scheduled task, WMI subscription, Run key, cron/systemd unit, authorized_keys change.
   action: Agent checks signer, path, creator and fleet prevalence; WMI subscriptions recommend contain by default.
   uses: [ACT-01, ACT-10]
-  done_when: Rule live on servers; workstation coverage via the weekly persistence sweep (I-04).
+  done_when: Rule live on servers; workstation coverage via the Threat Hunter's weekly stack-and-diff.
 
 - id: D-06
   name: New identity persistence (no-malware access)
@@ -672,7 +677,7 @@ capabilities:
   stage: move
   impact: H
   effort: L
-  baseline: true
+  baseline: false
   trigger: New privileged group membership, new OAuth app consent, new service principal secret, new cloud access key/user/admin policy, federation change.
   action: Agent identifies the actor and the change ticket; recommends revert + revoke the actor's sessions.
   uses: [ACT-03, ACT-06]
@@ -720,20 +725,6 @@ capabilities:
   uses: [ACT-06]
   done_when: Rules live for clients with cloud workloads.
 
-- id: D-10
-  name: Server making a new outbound connection
-  type: triage-detection
-  tier: 2
-  vectors: [pushed, post-access]
-  stage: cashout
-  impact: M
-  effort: M
-  baseline: false
-  trigger: Server talks to an external IP/domain/ASN not seen in its 30-day baseline, or a large upload.
-  action: Agent checks the process, destination reputation and timing; recommends an egress block.
-  uses: [ACT-07, ACT-01]
-  done_when: Baseline exists for tier B/C servers.
-
 - id: D-11
   name: Mass file download or external sharing in SaaS
   type: triage-detection
@@ -756,7 +747,7 @@ capabilities:
   stage: entry
   impact: H
   effort: M
-  baseline: true
+  baseline: false
   trigger: New admin account, admin login from an unusual source, config change, or firmware/image change on a VPN, firewall or other edge device. Also the edge device opening unexpected internal connections.
   action: Agent checks change tickets and admin history; recommends disabling the admin account and blocking the device's internal access.
   uses: [ACT-04, ACT-02]
@@ -770,7 +761,7 @@ capabilities:
   stage: any
   impact: H
   effort: M
-  baseline: true
+  baseline: false
   ai: true
   trigger: >
     An AI agent, coding assistant or MCP server process (or agent identity in SaaS) spawning
@@ -789,7 +780,7 @@ capabilities:
   stage: entry
   impact: H
   effort: L
-  baseline: true
+  baseline: false
   ai: true
   trigger: >
     New MCP server or agent extension in endpoint configs (e.g. mcp.json, IDE extensions), new
@@ -811,7 +802,7 @@ capabilities:
   stage: any
   impact: H
   effort: M
-  baseline: true
+  baseline: false
   trigger: Any Tier 1 action or Tier 2 detection involving a host.
   action: >
     From telemetry: process tree +/- 30 min, network connections, logons (who, type, from where),
@@ -826,7 +817,7 @@ capabilities:
   stage: any
   impact: H
   effort: M
-  baseline: true
+  baseline: false
   trigger: Any Tier 1 action or Tier 2 detection involving a user, agent or principal.
   action: >
     7 days of sign-ins (IP, ASN, device, app), MFA method changes, active sessions, group
@@ -841,23 +832,10 @@ capabilities:
   stage: any
   impact: H
   effort: M
-  baseline: true
+  baseline: false
   trigger: Any confirmed or contained incident.
   action: Fleet-wide search for the same hash, domain, IP, user, email sender/subject, and parent-child pattern; list every hit.
   done_when: Sweep runs automatically after containment and its results go into the case.
-
-- id: I-04
-  name: Weekly persistence stack-and-diff sweep
-  type: auto-investigation
-  tier: 2
-  vectors: [post-access]
-  stage: move
-  impact: M
-  effort: M
-  baseline: false
-  trigger: Weekly schedule.
-  action: Collect autoruns (Windows) and cron/systemd/authorized_keys/ld.so.preload (Linux) fleet-wide; stack rare entries; agent triages the diff.
-  done_when: First baseline collected; weekly diff lands in the agent queue.
 
 - id: I-05
   name: Initial access classification
@@ -867,7 +845,7 @@ capabilities:
   stage: entry
   impact: M
   effort: L
-  baseline: true
+  baseline: false
   trigger: Any incident.
   action: >
     Classify pulled (parent = email/browser/AI agent, workstation), pushed (server process
@@ -887,7 +865,7 @@ capabilities:
   stage: keys
   impact: H
   effort: L
-  baseline: true
+  baseline: false
   action: Scripted runbook to revoke all sessions for a group (e.g. all admins) and force reset, including service accounts with an owner list.
   done_when: Runbook exists and was dry-run against a test group.
 
@@ -899,7 +877,7 @@ capabilities:
   stage: move
   impact: H
   effort: L
-  baseline: true
+  baseline: false
   action: Per-server runbook covering block lateral/egress at the firewall, snapshot, disable the service account, and who must approve full isolation.
   done_when: Runbook exists for every tier C server class (DCs, hypervisors, databases, IdP connectors, etc.).
 
@@ -911,7 +889,7 @@ capabilities:
   stage: entry
   impact: H
   effort: L
-  baseline: true
+  baseline: false
   action: Kill switch list covering VPN, RMM tools, vendor accounts, SaaS integrations, AI connectors and API tokens, with the exact steps to disable each.
   done_when: List exists with owners and disable steps.
 
@@ -926,18 +904,6 @@ capabilities:
   baseline: false
   action: Tested runbook for a double krbtgt reset, Tier 0 account resets and IdP connector secret rotation.
   done_when: Runbook reviewed; krbtgt reset tested in a lab or performed in production.
-
-- id: M-05
-  name: Segment-wide internet egress kill switch
-  type: manual-action
-  tier: 2
-  vectors: [post-access]
-  stage: cashout
-  impact: M
-  effort: M
-  baseline: false
-  action: Pre-built firewall rule set to cut egress for a segment or site, except to EDR/IdP/SIEM.
-  done_when: Rule set exists (disabled) and the owner knows how to enable it.
 
 # --------------------------------------------------------------------------
 # HARDENING: the few preventive controls that make Tier 1 detections cleaner
@@ -976,7 +942,7 @@ capabilities:
   stage: entry
   impact: H
   effort: L
-  baseline: true
+  baseline: false
   action: EDR/OS prevention rules blocking Office apps from creating child processes and executable content, plus credential-stealing protection for LSASS.
   done_when: Rules in block mode on workstations.
 
@@ -992,18 +958,6 @@ capabilities:
   action: LAPS (or equivalent) everywhere; remove users from local admin.
   done_when: LAPS coverage > 95%; local admin membership report is clean.
 
-- id: H-05
-  name: Driver protection (HVCI + vulnerable driver blocklist)
-  type: hardening
-  tier: 0
-  vectors: [post-access]
-  stage: guards
-  impact: M
-  effort: M
-  baseline: false
-  action: Enable memory integrity (HVCI) and the vulnerable driver blocklist; move toward a driver allowlist.
-  done_when: Enabled on servers and workstations where compatible.
-
 - id: H-06
   name: Lock down the EDR console itself
   type: hardening
@@ -1012,7 +966,7 @@ capabilities:
   stage: guards
   impact: H
   effort: L
-  baseline: true
+  baseline: false
   action: Phishing-resistant MFA, small admin list, alerts on policy/exclusion changes and on uninstall-token retrieval.
   done_when: Console admin list reviewed and changes generate alerts.
 
@@ -1024,7 +978,7 @@ capabilities:
   stage: entry
   impact: H
   effort: M
-  baseline: true
+  baseline: false
   ai: true
   action: >
     Each agent runs as its own identity (never a human's admin account), with only the tools and

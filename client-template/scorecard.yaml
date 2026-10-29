@@ -67,7 +67,7 @@ capabilities:
   ACT-06:  # Revoke cloud credentials
     status: todo
     notes: ''
-  ACT-07:  # Block IOC fleet-wide
+  ACT-07:  # Network block (domain, IP, URL)
     status: todo
     notes: ''
   ACT-08:  # Purge email from all mailboxes
@@ -107,9 +107,6 @@ capabilities:
     status: todo
     notes: ''
   D-09:  # Cloud enumeration burst or new admin grant
-    status: todo
-    notes: ''
-  D-10:  # Server making a new outbound connection
     status: todo
     notes: ''
   D-11:  # Mass file download or external sharing in SaaS
@@ -169,9 +166,6 @@ capabilities:
   H-04:  # Unique local admin passwords, no standing local admin
     status: todo
     notes: ''
-  H-05:  # Driver protection (HVCI + vulnerable driver blocklist)
-    status: todo
-    notes: ''
   H-06:  # Lock down the EDR console itself
     status: todo
     notes: ''
@@ -187,9 +181,6 @@ capabilities:
   I-03:  # Blast radius sweep
     status: todo
     notes: ''
-  I-04:  # Weekly persistence stack-and-diff sweep
-    status: todo
-    notes: ''
   I-05:  # Initial access classification
     status: todo
     notes: ''
@@ -203,8 +194,5 @@ capabilities:
     status: todo
     notes: ''
   M-04:  # Domain-wide credential reset (krbtgt x2, Tier 0 accounts)
-    status: todo
-    notes: ''
-  M-05:  # Segment-wide internet egress kill switch
     status: todo
     notes: ''

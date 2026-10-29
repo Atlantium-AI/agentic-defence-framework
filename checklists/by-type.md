@@ -66,9 +66,9 @@ Within each type, ordered by impact then effort.
 - [ ] **ACT-09** Collect live evidence from a host · _H impact / M effort · Tier 0_
   - Action: On containment, pull a triage package (running processes, network connections, memory if feasible, key artifacts, autoruns) through the EDR or IR agent before anyone reboots or reimages.
   - Done when: Package collected automatically from a test host and attached to the case.
-- [ ] **ACT-07** Block IOC fleet-wide · _M impact / L effort · Tier 0_
-  - Action: Push a hash, domain, URL or IP block to EDR, DNS/proxy and email gateway in one step.
-  - Done when: One call blocks a test domain across all three layers.
+- [ ] **ACT-07** Network block (domain, IP, URL) · _M impact / L effort · Tier 0_
+  - Action: Block a malicious domain, IP or URL at DNS, proxy/firewall and email gateway in one step (plus the file hash in the EDR). Stops command-and-control, payload downloads and exfil destinations fleet-wide without touching any host or user.
+  - Done when: One call blocks a test domain and IP across DNS, firewall/proxy and email, and one call removes the block.
 - [ ] **ACT-08** Purge email from all mailboxes · _M impact / L effort · Tier 0_
   - Action: Find and remove a message (by sender, subject, URL or attachment hash) from every mailbox.
   - Done when: Tested on a test message sent to several mailboxes.
@@ -93,7 +93,7 @@ Within each type, ordered by impact then effort.
 - [ ] **A-03** Credential theft behavior on an endpoint · _H impact / L effort · Tier 1_
   - Trigger: High-confidence EDR alerts for LSASS dumping (incl. comsvcs MiniDump), SAM/SYSTEM hive save, DCSync from a non-DC, browser credential store theft.
   - Action: Contain the host, revoke sessions for every user logged on to it, force password reset.
-  - Uses actions: Isolate host via EDR (ACT-01), Revoke sessions and tokens (ACT-03), Reset password and MFA methods (ACT-05), Collect live evidence from a host (ACT-09)
+  - Uses actions: Isolate host via EDR (ACT-01), Revoke sessions and tokens (ACT-03), Reset password and MFA methods (ACT-05), Network block (domain, IP, URL) (ACT-07), Collect live evidence from a host (ACT-09)
   - Guardrails: Allowlist sanctioned memory-dump tools by hash and signer; tier C gets block-lateral + page.
   - Done when: Automation fires on the vendor's credential-theft alert categories; tested with a safe simulation.
 - [ ] **A-05** Office or email client spawning a script host · _H impact / L effort · Tier 1_
@@ -122,25 +122,25 @@ Within each type, ordered by impact then effort.
 - [ ] **A-14** Unapproved remote access or tunneling tool · _H impact / L effort · Tier 1_
   - Trigger: Execution or install of a remote access/RMM or tunneling tool not on the client's approved list (AnyDesk, ScreenConnect, TeamViewer, Atera, ngrok, cloudflared, Tailscale, Chisel, etc.).
   - Action: Kill the process, block its domains fleet-wide, and contain the host if it's a server or the tool came with other alerts.
-  - Uses actions: Kill process and quarantine file (ACT-10), Block IOC fleet-wide (ACT-07), Isolate host via EDR (ACT-01)
+  - Uses actions: Kill process and quarantine file (ACT-10), Network block (domain, IP, URL) (ACT-07), Isolate host via EDR (ACT-01)
   - Guardrails: Client-specific approved-tool list maintained with IT.
   - Done when: Approved list defined; rule in auto mode.
 - [ ] **A-15** Ransomware precursors · _H impact / L effort · Tier 1_
   - Trigger: Shadow copy deletion, backup catalog/job deletion, boot recovery disabled, mass stop of security/backup/database services, EDR ransomware behavior alerts.
   - Action: Isolate the host and disable the acting user immediately; page.
-  - Uses actions: Isolate host via EDR (ACT-01), Disable account (ACT-04), Collect live evidence from a host (ACT-09)
+  - Uses actions: Isolate host via EDR (ACT-01), Disable account (ACT-04), Network block (domain, IP, URL) (ACT-07), Collect live evidence from a host (ACT-09)
   - Guardrails: Allowlist the backup software's own maintenance jobs.
   - Done when: Rule in auto mode; tested with a safe simulation.
 - [ ] **A-16** Exfiltration tool on a server · _H impact / L effort · Tier 1_
   - Trigger: rclone, MEGAsync/megacmd, restic, WinSCP/curl/scp to file-sharing or cloud-storage domains not used by the business, run on a server.
   - Action: Kill the process, block the destination, contain the host (tier-aware).
-  - Uses actions: Kill process and quarantine file (ACT-10), Block IOC fleet-wide (ACT-07), Isolate host via EDR (ACT-01)
+  - Uses actions: Kill process and quarantine file (ACT-10), Network block (domain, IP, URL) (ACT-07), Isolate host via EDR (ACT-01)
   - Guardrails: Allowlist sanctioned backup/sync jobs by host and account.
   - Done when: Rule in auto mode on servers.
 - [ ] **A-04** EDR tampering or sensor gone silent · _H impact / M effort · Tier 1_
   - Trigger: EDR tamper alert, service stop, or a known-vulnerable driver load (LOLDrivers match). OR the sensor heartbeat is missing while the host is still seen on the network (DHCP/DNS/firewall/IdP).
-  - Action: Quarantine at a layer the attacker can't reach from the host; disable the logged-on user.
-  - Uses actions: Isolate host at the network layer (ACT-02), Disable account (ACT-04)
+  - Action: Quarantine at a layer the attacker can't reach from the host; disable the logged-on user. Until network-layer quarantine exists: try EDR isolation, disable the user, and page immediately.
+  - Uses actions: Isolate host via EDR (ACT-01), Isolate host at the network layer (ACT-02), Disable account (ACT-04)
   - Guardrails: Suppress during planned maintenance windows and EDR upgrade waves.
   - Done when: Heartbeat-gap rule exists and has a network-layer quarantine path for at least workstations.
 - [ ] **A-06** MFA fatigue burst followed by an approval · _H impact / M effort · Tier 1_
@@ -152,7 +152,7 @@ Within each type, ordered by impact then effort.
 - [ ] **A-07** Login page proxied by an AitM kit (canary CSS) · _H impact / M effort · Tier 1_
   - Trigger: The IdP sign-in page's custom branding loads a tracking resource; the referrer is not the IdP's own domain.
   - Action: Alert P1. Correlate users who signed in from the proxied page in that window; revoke their sessions and new MFA methods; block the phishing domain.
-  - Uses actions: Revoke sessions and tokens (ACT-03), Reset password and MFA methods (ACT-05), Block IOC fleet-wide (ACT-07)
+  - Uses actions: Revoke sessions and tokens (ACT-03), Reset password and MFA methods (ACT-05), Network block (domain, IP, URL) (ACT-07)
   - Guardrails: Verify the technique works with each IdP's custom branding before relying on it.
   - Done when: Canary in place and tested by loading the page through a test reverse proxy.
 - [ ] **A-09** One identity fanning out fast · _H impact / M effort · Tier 1_
@@ -179,7 +179,7 @@ Within each type, ordered by impact then effort.
 - [ ] **D-01** Any high/critical EDR alert not covered by Tier 1 · _H impact / L effort · Tier 2_
   - Trigger: EDR high/critical severity alert.
   - Action: Agent runs the host evidence pack and blast radius sweep, classifies pulled/pushed/walked, and recommends close/escalate/contain with evidence.
-  - Uses actions: Isolate host via EDR (ACT-01), Kill process and quarantine file (ACT-10)
+  - Uses actions: Isolate host via EDR (ACT-01), Network block (domain, IP, URL) (ACT-07), Kill process and quarantine file (ACT-10)
   - Done when: Every high/critical alert gets an agent write-up within 5 minutes.
 - [ ] **D-02** Risky sign-in or session anomaly · _H impact / L effort · Tier 2_
   - Trigger: IdP risk detections, new device + new ISP, impossible travel, token replay, sign-in from anonymizing infrastructure.
@@ -194,7 +194,7 @@ Within each type, ordered by impact then effort.
 - [ ] **D-04** Server process spawning a shell (exploited service) · _H impact / L effort · Tier 2_
   - Trigger: w3wp, httpd, nginx, java/tomcat, sqlservr, node, php spawning cmd/powershell/sh/bash, or a new script file written to a web directory.
   - Action: Agent pulls the process tree and web logs; recommends isolate (tier A/B) or kill process + page (tier C).
-  - Uses actions: Isolate host via EDR (ACT-01), Kill process and quarantine file (ACT-10), Collect live evidence from a host (ACT-09)
+  - Uses actions: Isolate host via EDR (ACT-01), Network block (domain, IP, URL) (ACT-07), Kill process and quarantine file (ACT-10), Collect live evidence from a host (ACT-09)
   - Done when: Rule live with known-good app behavior allowlisted. Strong candidate for Tier 1 after tuning.
 - [ ] **D-06** New identity persistence (no-malware access) · _H impact / L effort · Tier 2_
   - Trigger: New privileged group membership, new OAuth app consent, new service principal secret, new cloud access key/user/admin policy, federation change.
@@ -214,7 +214,7 @@ Within each type, ordered by impact then effort.
 - [ ] **D-13** AI agent doing something it shouldn't · _H impact / M effort · Tier 2_
   - Trigger: An AI agent, coding assistant or MCP server process (or agent identity in SaaS) spawning download-and-execute or network tools, touching credential stores or decoy files, connecting to new domains, or taking bulk actions (mass email, external sharing, permission changes) outside its normal pattern.
   - Action: Agent reviews the prompt/tool-call log and content the AI agent recently read (look for injected instructions); recommends the kill switch and blocking the source.
-  - Uses actions: Kill switch for an AI agent (ACT-11), Block IOC fleet-wide (ACT-07), Isolate host via EDR (ACT-01)
+  - Uses actions: Kill switch for an AI agent (ACT-11), Network block (domain, IP, URL) (ACT-07), Isolate host via EDR (ACT-01)
   - Done when: Rules live for every agent in the inventory with write/execute ability.
 - [ ] **D-07** Kerberoasting / credential spraying · _M impact / L effort · Tier 2_
   - Trigger: Burst of RC4 Kerberos service ticket requests from one source, or failed logons across many accounts from one source.
@@ -230,7 +230,7 @@ Within each type, ordered by impact then effort.
   - Trigger: New service, scheduled task, WMI subscription, Run key, cron/systemd unit, authorized_keys change.
   - Action: Agent checks signer, path, creator and fleet prevalence; WMI subscriptions recommend contain by default.
   - Uses actions: Isolate host via EDR (ACT-01), Kill process and quarantine file (ACT-10)
-  - Done when: Rule live on servers; workstation coverage via the weekly persistence sweep (I-04).
+  - Done when: Rule live on servers; workstation coverage via the Threat Hunter's weekly stack-and-diff.
 - [ ] **D-08** New kernel driver not seen in the fleet baseline · _M impact / M effort · Tier 2_
   - Trigger: Driver load with a hash+signer+name not in the fleet baseline.
   - Action: Agent checks LOLDrivers and signer reputation; known-vulnerable is handled by EDR tampering (A-04), unknown is recommended for review.
@@ -241,11 +241,6 @@ Within each type, ordered by impact then effort.
   - Action: Agent reviews the principal's history; recommends cutting off the principal.
   - Uses actions: Revoke cloud credentials (ACT-06)
   - Done when: Rules live for clients with cloud workloads.
-- [ ] **D-10** Server making a new outbound connection · _M impact / M effort · Tier 2_
-  - Trigger: Server talks to an external IP/domain/ASN not seen in its 30-day baseline, or a large upload.
-  - Action: Agent checks the process, destination reputation and timing; recommends an egress block.
-  - Uses actions: Block IOC fleet-wide (ACT-07), Isolate host via EDR (ACT-01)
-  - Done when: Baseline exists for tier B/C servers.
 
 ## Automatic investigations
 
@@ -265,10 +260,6 @@ Within each type, ordered by impact then effort.
   - Trigger: Any incident.
   - Action: Classify pulled (parent = email/browser/AI agent, workstation), pushed (server process parent, internet-facing host), or walked (valid login, no malware). This drives the blast radius sweep: pulled = email recipients, pushed = other exposed hosts, walked = other sessions of the identity.
   - Done when: Classification is a required field on every case.
-- [ ] **I-04** Weekly persistence stack-and-diff sweep · _M impact / M effort · Tier 2_
-  - Trigger: Weekly schedule.
-  - Action: Collect autoruns (Windows) and cron/systemd/authorized_keys/ld.so.preload (Linux) fleet-wide; stack rare entries; agent triages the diff.
-  - Done when: First baseline collected; weekly diff lands in the agent queue.
 
 ## Manual actions (pre-staged runbooks)
 
@@ -284,9 +275,6 @@ Within each type, ordered by impact then effort.
 - [ ] **M-04** Domain-wide credential reset (krbtgt x2, Tier 0 accounts) · _H impact / M effort · Tier 2_
   - Action: Tested runbook for a double krbtgt reset, Tier 0 account resets and IdP connector secret rotation.
   - Done when: Runbook reviewed; krbtgt reset tested in a lab or performed in production.
-- [ ] **M-05** Segment-wide internet egress kill switch · _M impact / M effort · Tier 2_
-  - Action: Pre-built firewall rule set to cut egress for a segment or site, except to EDR/IdP/SIEM.
-  - Done when: Rule set exists (disabled) and the owner knows how to enable it.
 
 ## Hardening
 
@@ -308,6 +296,3 @@ Within each type, ordered by impact then effort.
 - [ ] **H-07** Least privilege for AI agents · _H impact / M effort · Tier 0_
   - Action: Each agent runs as its own identity (never a human's admin account), with only the tools and data it needs, human approval for destructive or outbound actions (send, delete, share, execute), and an approved list of MCP servers/connectors.
   - Done when: Every agent that can write or execute has its own identity and an approval step for destructive actions.
-- [ ] **H-05** Driver protection (HVCI + vulnerable driver blocklist) · _M impact / M effort · Tier 0_
-  - Action: Enable memory integrity (HVCI) and the vulnerable driver blocklist; move toward a driver allowlist.
-  - Done when: Enabled on servers and workstations where compatible.

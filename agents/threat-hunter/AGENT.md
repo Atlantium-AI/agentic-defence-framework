@@ -6,7 +6,7 @@
 |---|---|
 | **Triggered by** | Weekly schedule; new threat intel from the Researcher; after any confirmed incident (hunt for the same thing elsewhere) |
 | **Starts at** | L0 Read-only. Findings go to triage as cases |
-| **Catalog capabilities** | Weekly persistence stack-and-diff sweep (I-04), fleet behavior baselines (T-14), new persistence on a server (D-05), new kernel driver (D-08) |
+| **Catalog capabilities** | Fleet behavior baselines (T-14), new persistence on a server (D-05), new kernel driver (D-08) |
 
 ## Skills
 

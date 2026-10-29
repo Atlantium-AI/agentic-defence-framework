@@ -6,11 +6,11 @@ Pulled in = user/agent brings it in. Pushed in = exploited service. Walked in = 
 
 | Vector | Baseline | Total |
 |---|---|---|
-| Pulled in | 18 | 19 |
-| Pushed in | 14 | 16 |
-| Walked in | 19 | 24 |
-| Post-access | 25 | 40 |
-| Attacks on your own AI | 5 | 5 |
+| Pulled in | 7 | 19 |
+| Pushed in | 7 | 15 |
+| Walked in | 7 | 24 |
+| Post-access | 12 | 36 |
+| Attacks on your own AI | 2 | 5 |
 
 ## Pulled in
 
@@ -28,7 +28,7 @@ Pulled in = user/agent brings it in. Pushed in = exploited service. Walked in = 
 - **D-13** AI agent doing something it shouldn't · _H impact / M effort · Tier 2_
 - **I-01** Host evidence pack · _H impact / M effort · Tier 2_
 - **I-03** Blast radius sweep · _H impact / M effort · Tier 2_
-- **ACT-07** Block IOC fleet-wide · _M impact / L effort · Tier 0_
+- **ACT-07** Network block (domain, IP, URL) · _M impact / L effort · Tier 0_
 - **ACT-08** Purge email from all mailboxes · _M impact / L effort · Tier 0_
 - **ACT-10** Kill process and quarantine file · _M impact / L effort · Tier 0_
 - **F-08** Measure detect-to-contain time with a quarterly simulation · _M impact / L effort · Tier 0_
@@ -47,11 +47,10 @@ Pulled in = user/agent brings it in. Pushed in = exploited service. Walked in = 
 - **D-12** Edge device admin or config change · _H impact / M effort · Tier 2_
 - **I-01** Host evidence pack · _H impact / M effort · Tier 2_
 - **I-03** Blast radius sweep · _H impact / M effort · Tier 2_
-- **ACT-07** Block IOC fleet-wide · _M impact / L effort · Tier 0_
+- **ACT-07** Network block (domain, IP, URL) · _M impact / L effort · Tier 0_
 - **ACT-10** Kill process and quarantine file · _M impact / L effort · Tier 0_
 - **F-08** Measure detect-to-contain time with a quarterly simulation · _M impact / L effort · Tier 0_
 - **I-05** Initial access classification · _M impact / L effort · Tier 2_
-- **D-10** Server making a new outbound connection · _M impact / M effort · Tier 2_
 
 ## Walked in
 
@@ -111,17 +110,13 @@ Pulled in = user/agent brings it in. Pushed in = exploited service. Walked in = 
 - **A-10** Workstation-to-workstation admin protocols · _H impact / M effort · Tier 1_
 - **I-01** Host evidence pack · _H impact / M effort · Tier 2_
 - **M-04** Domain-wide credential reset (krbtgt x2, Tier 0 accounts) · _H impact / M effort · Tier 2_
-- **ACT-07** Block IOC fleet-wide · _M impact / L effort · Tier 0_
+- **ACT-07** Network block (domain, IP, URL) · _M impact / L effort · Tier 0_
 - **ACT-10** Kill process and quarantine file · _M impact / L effort · Tier 0_
 - **F-07** Set up out-of-band comms and break-glass access · _M impact / L effort · Tier 0_
 - **D-07** Kerberoasting / credential spraying · _M impact / L effort · Tier 2_
 - **D-11** Mass file download or external sharing in SaaS · _M impact / L effort · Tier 2_
-- **H-05** Driver protection (HVCI + vulnerable driver blocklist) · _M impact / M effort · Tier 0_
 - **D-05** New persistence on a server · _M impact / M effort · Tier 2_
 - **D-08** New kernel driver not seen in the fleet baseline · _M impact / M effort · Tier 2_
-- **D-10** Server making a new outbound connection · _M impact / M effort · Tier 2_
-- **I-04** Weekly persistence stack-and-diff sweep · _M impact / M effort · Tier 2_
-- **M-05** Segment-wide internet egress kill switch · _M impact / M effort · Tier 2_
 
 ## Attacks on your own AI
 

@@ -1,79 +1,90 @@
-# The Plan
+# The Plan: 30 / 60 / 90 Days
 
-**Objective:** at every company, reach the **"basics done" bar**: the 20% of effort that gets 80% of the protection against machine-speed attacks. Then chase the rest.
+**Objective:** at every company, reach **"basics done"** in 90 days: the 23 capabilities that give 80% of the protection against machine-speed attacks. Everything else waits.
 
 ## The "basics done" bar
 
-A company is **basics done** when it can answer *yes* to all of these:
+A company is basics done when it can answer **yes** to all eight:
 
-1. **Authority.** Are automated containment actions pre-approved in writing? (F-01)
-2. **Asset tiers and data tables.** Is every host tagged A/B/C, with workstations auto-isolatable, and are the tables automation reads kept fresh by scripts with safe defaults? (F-02, F-11)
-3. **Identity tiers.** Do we know which accounts automation must never disable? (F-03)
-4. **Actions.** Can automation isolate a host (via EDR *and* at the network layer), revoke sessions, disable an account, reset credentials, revoke cloud credentials, block an IOC, purge an email, collect evidence and kill-switch an AI agent, each with one-click undo? (ACT-01 to ACT-11, F-04)
-5. **Visibility.** Is EDR on > 95% of hosts in prevent mode, and are the critical log sources flowing? (F-05, F-06)
-6. **Tripwires.** Are decoy files and canary accounts deployed and wired to auto-contain? (A-01, A-02)
-7. **Tier 1 automation.** Are credential theft, EDR tampering, Office→script, logging tampering, machine-speed recon, unapproved remote access tools, ransomware precursors and exfil tools auto-contained? (A-03, A-04, A-05, A-08, A-13 to A-16)
-8. **Identity.** Are MFA fatigue auto-contained and new MFA methods triaged, with admins on phishing-resistant MFA? (A-06, D-03, H-01)
-9. **Exposure.** Do we know what's internet-facing, patch actively exploited vulnerabilities on it within days, and watch edge device admin changes? (F-09, D-12)
-10. **Our own AI.** Do we know every AI agent and MCP server, what it can do, and can we kill-switch it without touching its users? (F-10, ACT-11, D-13, D-14, H-07)
-11. **Triage.** Does every high/critical alert get host + identity evidence packs and a recommendation within 5 minutes? (D-01, I-01, I-02)
-12. **Proof.** Have we measured detect-to-contain under 5 minutes in a simulation this quarter? (F-08)
+1. **Authority.** Are automated containment actions pre-approved in writing?
+2. **Know what to protect.** Is every host and identity tagged with what automation may do to it, and do we know what's internet-facing and which AI agents we run?
+3. **See.** Is EDR on > 95% of hosts in prevent mode with anti-tamper, and are the critical log sources flowing?
+4. **Act.** Can automation isolate a host, block a domain/IP network-wide, revoke sessions, disable an account and kill-switch an AI agent, each with one-click undo?
+5. **Tripwires.** Do decoy files and canary credentials auto-contain whoever touches them?
+6. **Automatic containment.** Are credential theft, EDR tampering, MFA fatigue, machine-speed recon and ransomware precursors contained in seconds on tier A?
+7. **Triage.** Does every high/critical alert, risky sign-in and server-spawned shell get an agent investigation and recommendation in under 5 minutes?
+8. **Identity.** Do all admins use phishing-resistant MFA?
 
-The full list of baseline items, sorted by impact and effort, is in [checklists/baseline.md](checklists/baseline.md).
+The 23 capabilities behind these are in [checklists/baseline.md](checklists/baseline.md).
 
-## Phases
+## Days 1–30: See and authorize
 
-### Phase 0: Foundations (weeks 1–3)
-Nothing automated is safe without these. Do them in parallel.
+**Goal:** permission to act, and an honest picture of what we can and can't see.
 
-- [ ] F-01 Containment authority signed
-- [ ] F-02 Asset tiers, starting with workstations = A on day 1 ([checklist](checklists/asset-containment-tiers.md))
-- [ ] F-03 Identity tiers / exclusion group
-- [ ] Response actions built and tested with undo, rate limits and audit (ACT-01 to ACT-11, F-04)
-- [ ] F-05 EDR coverage gaps and detect-only policies
-- [ ] F-06 Critical log sources ([checklist](checklists/critical-log-sources.md))
-- [ ] F-07 Out-of-band comms + break-glass
-- [ ] F-09 Internet exposure inventory and known-exploited patch SLA
-- [ ] F-10 AI agent / MCP server inventory
-- [ ] F-11 Reference data tables: the Tier 1 dependency tables first ([checklist](checklists/data-tables.md))
+- [ ] Containment authority policy drafted in week 1, signed by day 30 (F-01)
+- [ ] All workstations tagged auto-isolatable; servers default to contain-lite (F-02, [checklist](checklists/asset-containment-tiers.md))
+- [ ] Identity tiers: humans vs. service accounts, admins and break-glass (F-03)
+- [ ] EDR coverage gaps closed, prevent mode, anti-tamper on (F-05)
+- [ ] Critical log sources flowing with lag measured (F-06, [checklist](checklists/critical-log-sources.md))
+- [ ] Internet exposure inventory + patch SLA for known-exploited vulnerabilities (F-09)
+- [ ] AI agent and MCP server inventory (F-10)
+- [ ] Decoy files and canary credentials deployed in recommend-only mode (A-01)
+- [ ] **Blind Spot Detector** agent running read-only ([agents](agents/README.md))
+- [ ] Phishing-resistant MFA rollout started for admins (H-01)
 
-### Phase 1: Tier 1 automation (weeks 2–6)
-Each rule runs in **recommend-only mode for ~2 weeks**, then switches to auto once false positives are understood.
+**Exit:** policy signed · workstations tagged · first blind spot report delivered.
 
-- [ ] A-01 / A-02 Decoys and canary accounts (fastest, highest-fidelity win: deploy first)
-- [ ] A-03 Credential theft → isolate + revoke
-- [ ] A-05 Office → script host → isolate
-- [ ] A-08 Logging tampering → page / deny-all
-- [ ] A-04 EDR tamper / silent sensor → network-layer quarantine
-- [ ] A-06 MFA fatigue → revoke + reset
-- [ ] A-13 Machine-speed recon burst → contain
-- [ ] A-14 Unapproved remote access / tunneling tool → kill + block
-- [ ] A-15 Ransomware precursors → isolate + disable user
-- [ ] A-16 Exfiltration tool on a server → kill + block + contain
+## Days 31–60: Build the actions, switch on the tripwires
 
-### Phase 2: Tier 2 triage, recommend mode (weeks 4–10)
-Agents and skill packs are in [agents/](agents/README.md). Start the **Blind Spot Detector** (read-only) in Phase 0. It needs no approvals and finds the gaps. Then start the **Triage** agent in recommend mode here.
+**Goal:** every containment action works and can be undone; detections run in recommend-only mode so we learn their noise.
 
-- [ ] I-01 / I-02 Host and identity evidence packs on every case
-- [ ] D-01 Agent write-up on every high/critical EDR alert
-- [ ] D-02 / D-03 / D-06 Identity detections into the agent
-- [ ] D-04 Server spawning shell into the agent
-- [ ] D-12 Edge device admin/config changes into the agent
-- [ ] D-13 / D-14 AI agent misbehavior and new MCP servers/connectors into the agent
-- [ ] H-07 Least privilege for AI agents
-- [ ] I-03 Blast radius sweep, I-05 initial access classification
-- [ ] M-01 / M-02 / M-03 Manual runbooks written
+- [ ] Response actions built and tested with undo, rate limits and audit: isolate host via EDR, network block (domain/IP/URL), revoke sessions, disable account, AI agent kill switch (F-04, ACT-01, ACT-07, ACT-03, ACT-04, ACT-11)
+- [ ] Decoys switch to **automatic** (after 2 clean weeks)
+- [ ] Recommend-only: credential theft (A-03), EDR tampering / silent sensor (A-04), MFA fatigue (A-06), machine-speed recon (A-13), ransomware precursors (A-15)
+- [ ] **Triage** agent in recommend mode on EDR high/critical alerts, risky sign-ins and server-spawned shells (D-01, D-02, D-04)
+- [ ] **Data Steward** agent proposes server tiers; app owners answer one yes/no question per server
 
-### Phase 3: Graduation and the remaining 20%
-- [ ] Graduate Tier 2 actions to auto one at a time. Criterion: the agent's recommendation matched the analyst's decision on ≥ 95% of the last N cases (e.g. 30) for that action type
-- [ ] Non-baseline capabilities, sorted by impact/effort ([checklists/by-priority.md](checklists/by-priority.md))
-- [ ] F-08 quarterly simulation becomes routine
+**Exit:** all five actions tested end to end · decoys automatic · every high alert gets an agent write-up.
 
-## Design rules (apply everywhere)
+## Days 61–90: Go automatic and prove it
 
-- **Cut off whatever they're using.** Host → isolate. Identity → kill sessions. Key → revoke.
-- **Every automated action is reversible in one click** and logged.
-- **Tier checks at action time.** Missing tag = the safer tier (B).
-- **Rate limits.** Above N auto-isolations per hour, stop and page. A runaway rule must never cause the outage itself.
-- **Recommend first, then automate.** Every rule starts in recommend-only mode.
-- **Technology-agnostic here; specifics in the client repo.** Promote an implementation back to this repo once it's used at two or more clients.
+**Goal:** machine-speed containment on tier A, measured.
+
+- [ ] **Alert Tuner** runs graduation reviews; rules that pass go **automatic for tier A** (workstations, standard users)
+- [ ] Phishing-resistant MFA complete for all admins (H-01)
+- [ ] Safe attack simulation: decoy read, credential theft, recon burst, MFA burst. Measure detect-to-contain; target < 5 minutes
+- [ ] Executive scorecard: % basics done per attack vector, and what's next
+
+**Exit:** 6 detections containing automatically · time to contain measured · scorecard delivered.
+
+## What we need from leadership
+
+| Ask | When |
+|---|---|
+| Sign the containment authority policy | Day 30 |
+| Mandate phishing-resistant MFA for admins | Day 1 |
+| App owners: 15 minutes each to answer "can we isolate this server?" | Days 31–60 |
+| Read-only API access for the agents; automation platform access for actions | Day 1 |
+
+## How we keep it safe
+
+- **Recommend first.** Every rule runs recommend-only for 2 weeks before acting.
+- **Tier A only at first.** Workstations and standard users. Never-isolate servers and critical accounts always go to a human.
+- **One-click undo** on every action, **rate limits** so a bad rule can't cause an outage, and a full audit log.
+- **Agents earn autonomy per action type** (≥ 95% agreement with analysts, zero harmful calls).
+
+## Metrics
+
+| Metric | Day 30 | Day 90 target |
+|---|---|---|
+| EDR coverage in prevent mode | measure | > 95% |
+| Critical log sources flowing | measure | 100% |
+| Hosts with a containment tier | workstations | 100% (servers default to contain-lite) |
+| Detections containing automatically | 0 | 6 |
+| Time from alert to triage write-up | measure | < 5 min |
+| Detect-to-contain in simulation | — | < 5 min |
+| Admins on phishing-resistant MFA | measure | 100% |
+
+## Not in the first 90 days
+
+Deliberately deferred: network-layer quarantine, cloud-specific automation, workstation-to-workstation blocking, driver baselines, threat hunting and research agents, purple-team validation, SaaS exfil analytics. All are in [checklists/by-priority.md](checklists/by-priority.md), ready for the next quarter.

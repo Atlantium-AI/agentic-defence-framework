@@ -14,9 +14,10 @@ description: Choose response actions for a suspected compromise. Maps what the a
 | A host (malware, hands-on-keyboard, recon) | Isolate host via EDR | EDR is tampered or silent → isolate at the network layer |
 | An identity (stolen password, session, token) | Revoke sessions and tokens | Credential known stolen → reset password and MFA methods; still active → disable account |
 | A cloud key or principal | Revoke cloud credentials | — |
-| An email (phish delivered to many) | Purge email from all mailboxes | Payload or domain known → block IOC fleet-wide |
+| An email (phish delivered to many) | Purge email from all mailboxes | Payload or domain known → network block (domain, IP, URL) |
 | An AI agent (injected or misbehaving) | Kill switch for the AI agent | Source content known → block or remove it |
-| A tool (remote access, tunneling, exfil) | Kill process and quarantine file | Block its domains fleet-wide |
+| A tool (remote access, tunneling, exfil) | Kill process and quarantine file | Network block on its domains |
+| A remote server (C2, payload host, exfil destination) | Network block (domain, IP, URL) | — |
 
 Usually more than one applies. Credential theft on a host = isolate the host **and** revoke sessions for every user logged on to it.
 
@@ -33,7 +34,7 @@ For each target:
 | Tier | Host | Identity |
 |---|---|---|
 | A | Full isolation | Revoke, disable, reset |
-| B | Kill process, block IOC, page human with one-click isolation | Revoke sessions + page; disable needs a human |
+| B | Kill process, network block, page human with one-click isolation | Revoke sessions + page; disable needs a human |
 | C | **Never act.** Page immediately, recommend the manual runbook, contain the identity instead | **Never act.** Page immediately |
 
 ## 4. Recommend or execute?

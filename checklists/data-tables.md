@@ -30,10 +30,10 @@ Rules for every table:
 | **Identity containment tiers** (T-02) | tier1-dependency | ✓ | daily | Missing = B (revoke sessions + page; disable needs a click). |
 | **Containment exceptions and allowlists** (T-03) | tier1-dependency | ✓ | daily (expiry check) | Not on the list = no exception. |
 | **Decoy and canary registry** (T-04) | tier1-dependency | ✓ | weekly health check | Any access to a path or account in the registry = Tier 1 hit. |
-| **Approved remote access, RMM and tunneling tools** (T-05) | tier1-dependency | ✓ | weekly diff | Not on the list = unapproved. |
-| **Network segments and quarantine paths** (T-06) | tier1-dependency | ✓ | weekly | Unknown segment = no network-layer quarantine; page instead. |
+| **Approved remote access, RMM and tunneling tools** (T-05) | tier1-dependency |  | weekly diff | Not on the list = unapproved. |
+| **Network segments and quarantine paths** (T-06) | tier1-dependency |  | weekly | Unknown segment = no network-layer quarantine; page instead. |
 | **Change and maintenance windows** (T-07) | tier1-dependency |  | every 15 minutes | No matching change = no suppression. |
-| **Privileged identities** (T-08) | tier2-context | ✓ | daily | n/a (used for context and alerting) |
+| **Privileged identities** (T-08) | tier2-context |  | daily | n/a (used for context and alerting) |
 | **Service account baselines** (T-09) | tier2-context |  | daily | No baseline = alert, not auto-contain. |
 | **Internet exposure inventory** (T-10) | tier2-context | ✓ | weekly (KEV join daily) | New and unconfirmed exposure = alert. |
 | **AI agent and MCP inventory** (T-11) | tier2-context | ✓ | weekly | Not on the list = unapproved (triage detection fires). |
@@ -214,7 +214,7 @@ What is normal across the fleet (drivers, persistence entries, server outbound d
 - **Human:** none beyond triage escalations
 - **Refresh:** weekly · **Safe default:** New = goes to the agent, never auto-contained on its own.
 - **Columns:** type, value, signer_or_owner, host_count, first_seen
-- **Used by:** New persistence on a server (D-05), New kernel driver not seen in the fleet baseline (D-08), Server making a new outbound connection (D-10), Exfiltration tool on a server (A-16), Weekly persistence stack-and-diff sweep (I-04)
+- **Used by:** New persistence on a server (D-05), New kernel driver not seen in the fleet baseline (D-08), Exfiltration tool on a server (A-16)
 
 ### Cloud accounts and allowed regions (T-15)
 
