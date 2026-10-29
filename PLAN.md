@@ -25,7 +25,7 @@ The 23 capabilities behind these are in [checklists/baseline.md](checklists/base
 - [ ] All workstations tagged auto-isolatable; servers default to contain-lite (F-02, [checklist](checklists/asset-containment-tiers.md))
 - [ ] Identity tiers: humans vs. service accounts, admins and break-glass (F-03)
 - [ ] EDR coverage gaps closed, prevent mode, anti-tamper on (F-05)
-- [ ] Critical log sources flowing with lag measured (F-06, [checklist](checklists/critical-log-sources.md))
+- [ ] "Must have" log sources flowing with lag measured; "Collect now" by day 60 (F-06, [checklist](checklists/critical-log-sources.md))
 - [ ] Internet exposure inventory + patch SLA for known-exploited vulnerabilities (F-09)
 - [ ] AI agent and MCP server inventory (F-10)
 - [ ] Decoy files and canary credentials deployed in recommend-only mode (A-01)
