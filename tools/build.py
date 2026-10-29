@@ -1,7 +1,7 @@
 """Generate checklists from catalog/capabilities.yaml.
 
     python tools/build.py                  # regenerate checklists/ and client-template/scorecard.yaml
-    python tools/build.py --client <dir>   # sync <dir>/scorecard.yaml with the catalog, write <dir>/scorecard.md
+    python tools/build.py --client <dir>   # sync <dir>/scorecard.yaml and stack.yaml with the catalog, write <dir>/scorecard.md
 """
 
 import argparse
@@ -13,6 +13,7 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent
 CATALOG = ROOT / "catalog" / "capabilities.yaml"
 TABLES = ROOT / "catalog" / "data-tables.yaml"
+STACK = ROOT / "catalog" / "stack-coverage.yaml"
 OUT = ROOT / "checklists"
 TEMPLATE = ROOT / "client-template"
 
@@ -215,6 +216,7 @@ def build_client(caps, client_dir):
     if not todo:
         parts.append("Baseline complete. Move on to the framework's checklists/by-priority.md items.\n")
     write(client_dir / "scorecard.md", "".join(parts))
+    sync_stack(load_stack(caps), client_dir / "stack.yaml", name)
 
 
 TABLE_PRIORITIES = [
@@ -288,6 +290,87 @@ def build_tables(tables):
     write(OUT / "data-tables.md", "".join(parts))
 
 
+LOG_LEVELS = [("must", "Must have"), ("collect", "Collect now"), ("later", "Later")]
+STACK_STATUSES = ["unknown", "not-used", "partial", "in-use"]
+LOG_STATUSES = ["unknown", "missing", "partial", "flowing"]
+
+
+def load_stack(caps):
+    comps = yaml.safe_load(STACK.read_text(encoding="utf-8"))["components"]
+    names = {c["id"]: c["name"] for c in caps}
+    for s in comps:
+        for log in s["logs"]:
+            if log["level"] not in dict(LOG_LEVELS):
+                sys.exit(f"{s['id']}: log '{log['name']}' has unknown level {log['level']}")
+        for ref in s["capabilities"] + s["actions"]:
+            if ref not in names:
+                sys.exit(f"{s['id']}: unknown capability {ref}")
+        for ref in s["actions"]:
+            if not ref.startswith("ACT-"):
+                sys.exit(f"{s['id']}: {ref} is not an action")
+        s["cap_names"] = [f"{names[ref]} ({ref})" for ref in s["capabilities"]]
+        s["act_names"] = [f"{names[ref]} ({ref})" for ref in s["actions"]]
+    return comps
+
+
+def build_stack(comps):
+    parts = [
+        HEADER,
+        "# Stack Coverage\n\n",
+        "If a company runs X, it needs these logs, detections and actions. The blind spot skill ",
+        "(`agents/blind-spot-detector/skills/stack-intake`) asks the questions, records the answers in the ",
+        "client's `stack.yaml`, then checks the SIEM. Source: `catalog/stack-coverage.yaml`.\n",
+    ]
+    for s in comps:
+        parts.append(f"\n## {s['name']} ({s['id']})\n\n_In scope: {s['in_scope']}. Examples: {', '.join(s['examples'])}._\n\n")
+        parts.append("**Ask**\n\n" + "".join(f"- {q}\n" for q in s["ask"]))
+        if s["logs"]:
+            parts.append("\n**Logs**\n\n")
+            for key, label in LOG_LEVELS:
+                for log in (l for l in s["logs"] if l["level"] == key):
+                    parts.append(f"- [ ] {log['name']} ({label}) · e.g. {', '.join(log['examples'])}\n")
+        if s["cap_names"]:
+            parts.append("\n**Depends on it:** " + ", ".join(s["cap_names"]) + "\n")
+        if s["act_names"]:
+            parts.append("\n**Actions it must support:** " + ", ".join(s["act_names"]) + "\n")
+        parts.append("\n**Verify**\n\n" + "".join(f"- [ ] {v}\n" for v in s["verify"]))
+    write(OUT / "stack-coverage.md", "".join(parts))
+
+
+def sync_stack(comps, path, client_name):
+    existing = {}
+    if path.exists():
+        existing = (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get("components", {}) or {}
+
+    def val(v):
+        return yaml.safe_dump(v, default_flow_style=True, width=1000).strip().removesuffix("...").strip()
+
+    lines = [
+        f"# Tech stack for {client_name}. Filled in by the blind spot skill (stack-intake).",
+        f"# in_use: {' | '.join(STACK_STATUSES)}. logs: {' | '.join(LOG_STATUSES)}. source: interview | docs | verified.",
+        "# Product names, counts and yes/no only: no secrets, tenant IDs or IP addresses.",
+        "components:",
+    ]
+    for s in comps:
+        e = existing.get(s["id"]) or {}
+        in_use = e.get("in_use", "unknown")
+        if in_use not in STACK_STATUSES:
+            sys.exit(f"{path}: {s['id']} has invalid in_use '{in_use}'")
+        lines.append(f"  {s['id']}:  # {s['name']}")
+        lines.append(f"    in_use: {in_use}")
+        for key in ("products", "coverage", "source", "answered_by", "verified_on", "notes"):
+            lines.append(f"    {key}: {val(e.get(key, [] if key == 'products' else ''))}")
+        if s["logs"]:
+            logs = e.get("logs") or {}
+            lines.append("    logs:")
+            for log in s["logs"]:
+                state = logs.get(log["name"], "unknown")
+                if state not in LOG_STATUSES:
+                    sys.exit(f"{path}: {s['id']} log '{log['name']}' has invalid status '{state}'")
+                lines.append(f"      {val(log['name'])}: {state}  # {log['level']}")
+    write(path, "\n".join(lines) + "\n")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--client", help="client folder containing profile.yaml / scorecard.yaml")
@@ -301,7 +384,10 @@ def main():
     build_by_type(caps)
     build_by_vector(caps)
     build_tables(load_tables(caps))
+    stack = load_stack(caps)
+    build_stack(stack)
     sync_scorecard(caps, TEMPLATE / "scorecard.yaml", "<client>")
+    sync_stack(stack, TEMPLATE / "stack.yaml", "<client>")
 
 
 if __name__ == "__main__":

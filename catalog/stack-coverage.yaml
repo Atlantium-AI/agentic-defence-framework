@@ -1,0 +1,186 @@
+# Stack coverage: "if a company has X, it needs these logs, detections and actions."
+#
+# The blind spot skill (agents/blind-spot-detector/skills/stack-intake) asks the
+# questions below, records the answers in the client's stack.yaml, then checks each
+# component's logs and detections in the SIEM.
+#
+# Fields
+#   id          Stable code (S-xx)
+#   name        Readable name
+#   ask         The intake question(s). Short, answerable in one line
+#   examples    Common products, to offer as choices (not an endorsement)
+#   in_scope    When this component applies at all
+#   logs        Log sources it must produce. level = must | collect | later
+#               (matches checklists/critical-log-sources.md). examples = product-specific names
+#   capabilities  Capability codes (detections and foundations) that depend on it
+#   actions     Response actions (ACT-xx) this component must support
+#   verify      How to prove the answer without trusting the interview
+#   docs_search Terms to search the wiki / CMDB for, to find tech nobody mentioned
+
+components:
+
+- id: S-01
+  name: Endpoint (EDR)
+  ask:
+    - Which EDR, and on what share of Windows, Mac and Linux machines?
+    - Is it in block mode with anti-tamper on, or alert-only?
+  examples: [Microsoft Defender for Endpoint, CrowdStrike Falcon, SentinelOne, Elastic Defend]
+  in_scope: always
+  logs:
+    - {name: "EDR alerts and telemetry (process, file, network)", level: must, examples: [DeviceProcessEvents, Falcon event stream, Deep Visibility]}
+    - {name: "EDR sensor health / heartbeat", level: must, examples: [DeviceInfo, sensor last-seen]}
+    - {name: "EDR console audit (policy, exclusions, uninstall tokens)", level: must, examples: [Defender portal audit, Falcon audit log]}
+    - {name: "Decoy file read auditing", level: must, examples: [EDR file-open events, Windows 4663 with SACL on decoys]}
+  capabilities: [A-01, A-03, A-04, A-13, A-15, D-01, D-04]
+  actions: [ACT-01, ACT-10]
+  verify:
+    - EDR machine count vs. AD / IdP device count / CMDB. The difference is unmanaged machines
+    - Policies in detect-only or with prevention off
+    - Last event time for each EDR table in the SIEM
+  docs_search: [EDR, antivirus, endpoint protection, sensor, agent rollout]
+
+- id: S-02
+  name: On-prem directory (Active Directory)
+  ask:
+    - Is there on-prem Active Directory? How many domains?
+    - Are domain controller security logs in the SIEM, from every DC?
+  examples: [Active Directory, Samba AD]
+  in_scope: if any on-prem AD exists, including hybrid
+  logs:
+    - {name: "Domain controller security logs (logons, Kerberos, account/group changes, log cleared)", level: must, examples: ["4624", "4768", "4769", "4720", "4728", "1102"]}
+    - {name: "AD-to-cloud sync / connector logs", level: later, examples: [Entra Connect, Okta AD agent]}
+  capabilities: [A-02, D-07]
+  actions: [ACT-04, ACT-05]
+  verify:
+    - Count DCs sending logs vs. DCs in AD. One silent DC is a blind spot
+  docs_search: [domain controller, Active Directory, AD Connect, forest]
+
+- id: S-03
+  name: Cloud identity provider (SSO)
+  ask:
+    - Which identity provider do people sign in with? Do SaaS apps go through it (SSO)?
+    - Which MFA methods are allowed? Are admins on phishing-resistant MFA?
+  examples: [Microsoft Entra ID, Okta, Google Workspace, Ping]
+  in_scope: always
+  logs:
+    - {name: "Sign-ins including MFA events (interactive and non-interactive)", level: must, examples: [SigninLogs, AADNonInteractiveUserSignInLogs, Okta System Log]}
+    - {name: "Identity audit (MFA method, role and app consent changes)", level: must, examples: [AuditLogs, Okta System Log]}
+    - {name: "Identity risk detections", level: must, examples: [Entra ID Protection, Okta Identity Threat Protection]}
+  capabilities: [A-06, D-02, D-03, D-06]
+  actions: [ACT-03, ACT-04, ACT-05]
+  verify:
+    - Last event time for sign-in, audit and risk logs
+    - SaaS apps in the IdP vs. SaaS apps on the expense report / docs. Apps outside SSO keep sessions after a revoke
+  docs_search: [SSO, single sign-on, Okta, Entra, Azure AD, MFA, conditional access]
+
+- id: S-04
+  name: SIEM and automation platform
+  ask:
+    - Which SIEM? How long is data searchable?
+    - Which automation platform runs response actions? Can it call the EDR and IdP APIs?
+  examples: [Microsoft Sentinel, Splunk, Google SecOps, Elastic, Tines, Torq, AWS Step Functions, Sentinel playbooks]
+  in_scope: always
+  logs:
+    - {name: "Automation platform audit (every action, trigger, undo)", level: collect, examples: [Tines audit, Logic Apps run history]}
+  capabilities: [F-04, F-12]
+  actions: []
+  verify:
+    - Last event time per source table / sourcetype
+    - Ingest lag (ingest time minus event time) per source
+  docs_search: [SIEM, SOAR, playbook, runbook, Splunk, Sentinel]
+
+- id: S-05
+  name: Cloud (AWS, Azure, GCP)
+  ask:
+    - Which clouds, and roughly how many accounts or subscriptions?
+    - Is control-plane logging org-wide, and is threat detection on in every account and region?
+  examples: [AWS, Azure, Google Cloud]
+  in_scope: if any cloud workloads
+  logs:
+    - {name: "Cloud control plane", level: must, examples: [CloudTrail org trail, Azure Activity log, GCP Audit Logs]}
+    - {name: "Cloud threat detection findings", level: must, examples: [GuardDuty, Defender for Cloud, Security Command Center]}
+    - {name: "Cloud identity sign-ins", level: later, examples: [IAM Identity Center, Azure portal sign-ins]}
+  capabilities: [A-08, A-11, A-12, D-06, D-09]
+  actions: [ACT-06, ACT-12]
+  verify:
+    - Accounts in the cloud org vs. accounts sending control-plane logs
+    - Regions with threat detection off
+  docs_search: [AWS account, subscription, landing zone, CloudTrail, GuardDuty, GCP project]
+
+- id: S-06
+  name: Internet-facing and edge devices
+  ask:
+    - Which VPN, firewall and remote access products face the internet?
+    - Do their admin logins and config changes reach the SIEM?
+  examples: [Palo Alto, Fortinet, Cisco ASA / FTD, Ivanti, Check Point, Citrix NetScaler, Zscaler, Cloudflare]
+  in_scope: always
+  logs:
+    - {name: "Edge device admin and config logs", level: must, examples: [admin sign-ins, config commits, firmware changes]}
+    - {name: "VPN / remote access sign-ins", level: collect, examples: [GlobalProtect, FortiClient, ZTNA logs]}
+    - {name: "WAF / load balancer logs", level: later, examples: [AWS WAF, Azure Front Door, Cloudflare]}
+  capabilities: [F-09, D-12]
+  actions: [ACT-07]
+  verify:
+    - External scan or attack-surface tool vs. the inventory. Unknown internet-facing systems are the top blind spot
+    - Each edge device has a vendor, version, owner and log source in the inventory the triage agent reads
+  docs_search: [VPN, firewall, remote access, DMZ, public IP, ZTNA]
+
+- id: S-07
+  name: Network services (DNS, DHCP, proxy)
+  ask:
+    - Where do DNS queries resolve (internal DNS, protective DNS)? Is there a web proxy?
+    - Can we block a domain or IP centrally?
+  examples: [Windows DNS, Infoblox, Cisco Umbrella, Cloudflare Gateway, Zscaler, Netskope]
+  in_scope: always
+  logs:
+    - {name: 'A second "host is alive" source', level: must, examples: [DHCP leases, internal DNS queries, IdP device sign-ins]}
+    - {name: "DNS query logs", level: collect, examples: [Windows DNS analytic, Umbrella, Route 53 Resolver]}
+    - {name: "Firewall / proxy / web gateway", level: later, examples: [Zscaler, Palo Alto traffic logs]}
+  capabilities: [A-04]
+  actions: [ACT-07]
+  verify:
+    - A test block on a harmless domain shows up in DNS logs as blocked
+  docs_search: [DNS, DHCP, proxy, Umbrella, web filter]
+
+- id: S-08
+  name: Email and collaboration
+  ask:
+    - Microsoft 365 or Google Workspace? Is there a separate email gateway?
+  examples: [Microsoft 365, Google Workspace, Proofpoint, Mimecast, Abnormal]
+  in_scope: always
+  logs:
+    - {name: "Email gateway logs (delivery, clicks, attachments)", level: collect, examples: [EmailEvents, Proofpoint TAP]}
+    - {name: "Microsoft 365 / Workspace audit log", level: later, examples: [Unified audit log, Workspace admin and Drive audit]}
+  capabilities: [A-05, D-11]
+  actions: [ACT-08]
+  verify:
+    - Last event time for email and audit logs
+  docs_search: [Exchange, Microsoft 365, Google Workspace, email gateway, Proofpoint, Mimecast]
+
+- id: S-09
+  name: AI agents and connectors
+  ask:
+    - Which AI agents can send, change or run things (not just chat)? Who owns each?
+    - Which MCP servers, connectors or OAuth apps do they use?
+  examples: [Copilot Studio agents, Claude Code, ChatGPT connectors, custom agents on an agent platform]
+  in_scope: if any agent can write or execute
+  logs:
+    - {name: "AI agent platform logs (prompts, tool calls, actions, connector changes)", level: collect, examples: [platform audit log, MCP gateway logs]}
+  capabilities: [F-10, D-13, D-14]
+  actions: [ACT-03, ACT-04]
+  verify:
+    - Agent processes, MCP configs and AI OAuth apps seen on machines or in the IdP vs. the agent inventory
+  docs_search: [AI agent, Copilot, MCP, LLM, chatbot, automation bot]
+
+- id: S-10
+  name: Documentation and asset sources
+  ask:
+    - Where do architecture docs live (wiki, SharePoint)? Is there a CMDB or asset list anyone trusts?
+  examples: [Confluence, SharePoint, Notion, ServiceNow CMDB, a spreadsheet]
+  in_scope: always
+  logs: []
+  capabilities: [F-02, F-09]
+  actions: []
+  verify:
+    - Search the docs with every component's docs_search terms; anything found that isn't in stack.yaml goes back to the user as a question
+  docs_search: [architecture, network diagram, asset inventory, CMDB]

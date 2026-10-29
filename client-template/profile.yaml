@@ -7,31 +7,9 @@ owners:
   security_lead: <name>
   containment_approver: <name>   # signs F-01
 
-identity:
-  source_of_truth: <AD | Entra | Okta>
-  flows: <how identities flow from the source of truth to apps>
-  mfa: <methods in use; phishing-resistant for admins? y/n>
-
-endpoint:
-  edr: <product>
-  coverage_pct: <n>
-  prevent_mode: <y/n/partial>
-  anti_tamper: <y/n>
-  other_agents: <endpoint management, IR or logging agents>
-
-siem:
-  product: <product>
-  critical_log_gaps: []   # from checklists/critical-log-sources.md
-
-automation:
-  platform: <SOAR, SIEM playbooks or cloud-native automation>
-  # Action readiness is tracked in scorecard.yaml (ACT-01 to ACT-11)
-
-cloud:
-  providers: []   # aws, azure, gcp
-  m365: <y/n>
-
-ai_agents: []   # name, identity, can_write_or_execute (y/n), owner, logs_in_siem (y/n)
+# The tech stack (EDR, identity, SIEM, automation, cloud, edge, AI agents) lives in
+# stack.yaml, filled in by the blind spot skill. Action readiness is in scorecard.yaml.
+stack: stack.yaml
 
 approved_remote_access_tools: []   # anything else triggers A-14
 

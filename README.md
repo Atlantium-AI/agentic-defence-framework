@@ -12,6 +12,8 @@ Agentic attackers go from access to impact in minutes (fastest observed eCrime b
 | [PLAN.md](PLAN.md) | The 80/20 rollout plan and the **"basics done" bar** for every company |
 | [catalog/capabilities.yaml](catalog/capabilities.yaml) | **Source of truth.** Every capability, scored by impact and effort |
 | [checklists/](checklists/) | Generated from the catalog: build `checklists/` with `python tools/build.py` |
+| [catalog/stack-coverage.yaml](catalog/stack-coverage.yaml) | If a company runs X, the logs, detections and actions it needs. Drives the blind spot skill |
+| [checklists/stack-coverage.md](checklists/stack-coverage.md) | Generated: stack coverage as a readable checklist |
 | [catalog/data-tables.yaml](catalog/data-tables.yaml) | The reference data tables automation reads, and how each is maintained |
 | [checklists/data-tables.md](checklists/data-tables.md) | Generated: tables by priority, with sources and who maintains what |
 | [checklists/asset-containment-tiers.md](checklists/asset-containment-tiers.md) | Critical path: building the can/cannot auto-quarantine list |
@@ -43,7 +45,7 @@ Agentic attackers go from access to impact in minutes (fastest observed eCrime b
 ## Using it at a client
 
 1. Copy `client-template/` into the client's private workspace.
-2. Fill out `profile.yaml` (stack, identity source of truth, automation platform).
+2. Run the blind spot skill ([stack-intake](agents/blind-spot-detector/skills/stack-intake/SKILL.md), or `/blind-spot-check` in Claude Code). It fills in `stack.yaml` and writes `blind-spots.md`.
 3. Work [PLAN.md](PLAN.md) Phase 0 → Phase 1, tracking status in the client's `scorecard.yaml`.
 4. Technology-specific queries/playbooks get filled in per client and, once reused at two or more clients, promoted back here.
 

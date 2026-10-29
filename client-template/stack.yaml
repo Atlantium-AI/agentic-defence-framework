@@ -1,0 +1,115 @@
+# Tech stack for <client>. Filled in by the blind spot skill (stack-intake).
+# in_use: unknown | not-used | partial | in-use. logs: unknown | missing | partial | flowing. source: interview | docs | verified.
+# Product names, counts and yes/no only: no secrets, tenant IDs or IP addresses.
+components:
+  S-01:  # Endpoint (EDR)
+    in_use: unknown
+    products: []
+    coverage: ''
+    source: ''
+    answered_by: ''
+    verified_on: ''
+    notes: ''
+    logs:
+      EDR alerts and telemetry (process, file, network): unknown  # must
+      EDR sensor health / heartbeat: unknown  # must
+      EDR console audit (policy, exclusions, uninstall tokens): unknown  # must
+      Decoy file read auditing: unknown  # must
+  S-02:  # On-prem directory (Active Directory)
+    in_use: unknown
+    products: []
+    coverage: ''
+    source: ''
+    answered_by: ''
+    verified_on: ''
+    notes: ''
+    logs:
+      Domain controller security logs (logons, Kerberos, account/group changes, log cleared): unknown  # must
+      AD-to-cloud sync / connector logs: unknown  # later
+  S-03:  # Cloud identity provider (SSO)
+    in_use: unknown
+    products: []
+    coverage: ''
+    source: ''
+    answered_by: ''
+    verified_on: ''
+    notes: ''
+    logs:
+      Sign-ins including MFA events (interactive and non-interactive): unknown  # must
+      Identity audit (MFA method, role and app consent changes): unknown  # must
+      Identity risk detections: unknown  # must
+  S-04:  # SIEM and automation platform
+    in_use: unknown
+    products: []
+    coverage: ''
+    source: ''
+    answered_by: ''
+    verified_on: ''
+    notes: ''
+    logs:
+      Automation platform audit (every action, trigger, undo): unknown  # collect
+  S-05:  # Cloud (AWS, Azure, GCP)
+    in_use: unknown
+    products: []
+    coverage: ''
+    source: ''
+    answered_by: ''
+    verified_on: ''
+    notes: ''
+    logs:
+      Cloud control plane: unknown  # must
+      Cloud threat detection findings: unknown  # must
+      Cloud identity sign-ins: unknown  # later
+  S-06:  # Internet-facing and edge devices
+    in_use: unknown
+    products: []
+    coverage: ''
+    source: ''
+    answered_by: ''
+    verified_on: ''
+    notes: ''
+    logs:
+      Edge device admin and config logs: unknown  # must
+      VPN / remote access sign-ins: unknown  # collect
+      WAF / load balancer logs: unknown  # later
+  S-07:  # Network services (DNS, DHCP, proxy)
+    in_use: unknown
+    products: []
+    coverage: ''
+    source: ''
+    answered_by: ''
+    verified_on: ''
+    notes: ''
+    logs:
+      A second "host is alive" source: unknown  # must
+      DNS query logs: unknown  # collect
+      Firewall / proxy / web gateway: unknown  # later
+  S-08:  # Email and collaboration
+    in_use: unknown
+    products: []
+    coverage: ''
+    source: ''
+    answered_by: ''
+    verified_on: ''
+    notes: ''
+    logs:
+      Email gateway logs (delivery, clicks, attachments): unknown  # collect
+      Microsoft 365 / Workspace audit log: unknown  # later
+  S-09:  # AI agents and connectors
+    in_use: unknown
+    products: []
+    coverage: ''
+    source: ''
+    answered_by: ''
+    verified_on: ''
+    notes: ''
+    logs:
+      AI agent platform logs (prompts, tool calls, actions, connector changes): unknown  # collect
+  S-10:  # Documentation and asset sources
+    in_use: unknown
+    products: []
+    coverage: ''
+    source: ''
+    answered_by: ''
+    verified_on: ''
+    notes: ''
