@@ -22,8 +22,8 @@ Within each type, ordered by impact then effort.
   - Action: Compare EDR inventory to AD/IdP/DHCP/cloud inventories to find unmanaged hosts. Enforce prevent mode (not detect-only), anti-tamper with an uninstall password, and review exclusions.
   - Done when: Coverage > 95% of known hosts; no detect-only policies on production without a written reason.
 - [ ] **F-06** Get the minimum log sources into the SIEM · _H impact / M effort · Tier 0_
-  - Action: Collect the "Critical" tier of checklists/critical-log-sources.md: EDR, identity sign-ins and audit (AD, Entra, Okta), M365/email, DNS, cloud control plane (Azure, AWS), remote access, and AI agent platforms. Near real-time (< 5 min lag).
-  - Done when: Every Critical source is present and its ingest lag is measured on a dashboard.
+  - Action: Collect the "Must have" and "Collect now" tiers of checklists/critical-log-sources.md: EDR telemetry, sensor health and console audit, decoy read auditing, identity provider sign-ins, audit and risk, domain controllers, DNS, email gateway, remote access, cloud control plane, AI agent platforms. Near real-time (< 5 min lag).
+  - Done when: Every Must have source is flowing with ingest lag on a dashboard and a silence alert; Collect now sources by day 60.
 - [ ] **F-09** Know what's exposed to the internet · _H impact / M effort · Tier 0_
   - Action: Inventory of every internet-facing service (VPN, firewalls, web apps, RDP, file transfer, email), refreshed by external scanning. Patch SLA of 48-72h for known-exploited (e.g. CISA KEV) vulnerabilities on these assets; alert on newly exposed services.
   - Done when: Exposure list exists with owners, and known-exploited vulnerabilities on it are tracked to the SLA.

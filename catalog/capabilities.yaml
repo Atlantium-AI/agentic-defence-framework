@@ -111,10 +111,11 @@ capabilities:
   effort: M
   baseline: true
   action: >
-    Collect the "Critical" tier of checklists/critical-log-sources.md: EDR, identity sign-ins
-    and audit (AD, Entra, Okta), M365/email, DNS, cloud control plane (Azure, AWS), remote
-    access, and AI agent platforms. Near real-time (< 5 min lag).
-  done_when: Every Critical source is present and its ingest lag is measured on a dashboard.
+    Collect the "Must have" and "Collect now" tiers of checklists/critical-log-sources.md: EDR
+    telemetry, sensor health and console audit, decoy read auditing, identity provider sign-ins,
+    audit and risk, domain controllers, DNS, email gateway, remote access, cloud control plane,
+    AI agent platforms. Near real-time (< 5 min lag).
+  done_when: Every Must have source is flowing with ingest lag on a dashboard and a silence alert; Collect now sources by day 60.
 
 - id: F-07
   name: Set up out-of-band comms and break-glass access

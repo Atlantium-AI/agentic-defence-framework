@@ -1,87 +1,55 @@
 # Critical Log Sources
 
-The minimum telemetry needed to detect pulled / pushed / walked-in attacks and feed the Tier 1 and Tier 2 detections. Only collect sources that exist at the client.
+80/20 rule: a log is **critical** only if a detection or response in the 90-day plan can't work without it. Only collect sources the company actually has.
 
-**Critical** = required for the baseline. Most Tier 1 automation depends on it.
-**Important** = collect next. Most Tier 2 investigations need it.
+| Tier | Meaning | When |
+|---|---|---|
+| **Must have** | A day-90 detection or response depends on it | Days 1–30 |
+| **Collect now** | No day-90 detection, but investigations need it | Days 1–60 |
+| **Later** | Powers next-quarter detections | After day 90 |
 
-Rules for every source:
+Rules for every Must have and Collect now source:
 - [ ] Near real-time into the SIEM (target < 5 min lag), with lag on a dashboard
-- [ ] Alert when a source goes silent (silence is a "blind the guards" signal)
-- [ ] Retention ≥ 90 days hot, ≥ 1 year somewhere
+- [ ] Alert when the source goes silent (silence is a "blind the guards" signal)
+- [ ] ≥ 90 days searchable retention
 
-## Endpoints
+## Must have
 
-| Source | Tier | Why |
+| Source | Examples | Powers |
 |---|---|---|
-| EDR alerts + telemetry (process, network, file, driver) | Critical | Primary view of pulled-in and post-access activity |
-| EDR sensor health / heartbeat | Critical | Detects tampering and silent sensors (A-04) |
-| EDR console audit (policy, exclusion, uninstall-token changes) | Critical | Attacker with console access can blind everything |
-| Windows Security log on servers (logons, account/group changes, service/task creation, log cleared) | Important | Context where EDR is weak; required on servers without EDR |
-| Linux auth + auditd (sudo, SSH, cron, systemd, authorized_keys) | Important | Linux servers often have weaker EDR coverage |
+| **EDR alerts and telemetry** (process, file, network) | Any EDR | Credential theft, machine-speed recon, ransomware precursors, server spawning a shell, EDR alert triage |
+| **EDR sensor health / heartbeat** | EDR sensor status | EDR tampering / silent sensor |
+| **A second "host is alive" source** | DHCP leases, internal DNS queries, or IdP device sign-ins | Tells a silent-but-online host (tampering) from a switched-off laptop |
+| **EDR console audit** | Policy, exclusion, uninstall-token changes | Catches an attacker blinding the EDR from the console |
+| **Decoy file read auditing** | EDR file-read telemetry, or Windows object-access auditing (SACL) on decoys | Decoy tripwires. File reads aren't logged by default |
+| **Identity provider sign-ins, including MFA events** | Entra sign-in logs (interactive + non-interactive), Okta System Log | MFA fatigue, risky sign-in triage, token replay |
+| **Identity provider audit** | MFA method changes, role changes, app consents | MFA fatigue response, identity investigations |
+| **Identity provider risk detections** | Entra ID Protection, Okta ThreatInsight / Identity Threat Protection | Risky sign-in triage |
+| **Domain controller security logs** | Logons, Kerberos ticket requests, account/group changes, log cleared | Canary account hits, credential and lateral movement context |
 
-## Active Directory
+## Collect now
 
-| Source | Tier | Why |
+| Source | Examples | Why |
 |---|---|---|
-| Domain controller Security logs: logons, Kerberos TGT/TGS requests, account and group changes, log cleared | Critical | Canary accounts (A-02), fan-out (A-09), Kerberoasting, privilege grants |
-| Directory changes (GPO, ACL, AdminSDHolder, trusts) | Important | Persistence and privilege escalation |
-| AD-to-cloud sync / connector logs (Entra Connect, Okta AD agent) | Important | Sync servers are a bridge from on-prem to cloud identity |
+| **DNS query logs** | Internal resolvers or protective DNS | Proves network blocks work; blast radius ("who else talked to this domain?") |
+| **Email gateway logs** | Delivery, clicks, attachments | "How did it get here, and who else got it?" for pulled-in attacks |
+| **VPN / remote access sign-ins** | VPN, ZTNA, VDI gateways | Walked-in investigations; edge devices are a top exploitation target |
+| **Cloud control plane** (if there are cloud workloads) | AWS CloudTrail (org trail, all regions), Azure Activity log | Investigations now; cloud detections next quarter |
+| **AI agent platform logs** (agents that can write or execute) | Prompts, tool calls, actions taken, connector/MCP changes | The only record of what a misbehaving agent did |
+| **Automation platform audit** | Every automated action, who/what triggered it, undo | Containment must be auditable and reversible |
 
-## Entra ID / Azure
+## Later (next quarter)
 
-| Source | Tier | Why |
-|---|---|---|
-| Sign-in logs (interactive, non-interactive, service principal, managed identity) | Critical | Walked-in detection; token replay shows in non-interactive |
-| Audit logs (MFA method changes, app consents, role assignments, SP secrets, federation) | Critical | Identity persistence (D-03, D-06) |
-| Identity Protection risk detections | Critical | Risky sign-in triage (D-02) |
-| Azure Activity log (subscription control plane) | Critical (if Azure workloads) | Logging tampering, role grants, resource abuse |
-| Key Vault, storage and NSG flow logs | Important | Secret access and data exfiltration |
-
-## Microsoft 365
-
-| Source | Tier | Why |
-|---|---|---|
-| Unified audit log (Exchange, SharePoint, OneDrive, Teams) | Critical | Inbox rules, mass download, internal phishing after takeover |
-| Email gateway / Defender for Office (delivery, clicks, attachments) | Critical | How pulled-in attacks arrived, and who else received them |
-| Mailbox audit (MailItemsAccessed) | Important | Scoping what an attacker read |
-
-## Okta
-
-| Source | Tier | Why |
-|---|---|---|
-| System Log (all events: authentication, MFA push/verify, factor enroll/reset, admin actions, session, policy changes) | Critical | Walked-in detection, MFA fatigue (A-06), new factors (D-03) |
-| ThreatInsight / Identity Threat Protection events | Critical | Risk signals and universal logout events |
-| Admin console and API token activity | Critical | IdP admin takeover = keys to everything |
-
-## AWS
-
-| Source | Tier | Why |
-|---|---|---|
-| CloudTrail management events, org trail, all regions | Critical | Logging tampering, IAM changes, unused-region activity |
-| GuardDuty findings, all accounts and regions | Critical | Instance creds used outside AWS, credential exfiltration (A-12) |
-| IAM Identity Center / SSO sign-ins | Critical | Human access into AWS |
-| CloudTrail data events for sensitive S3 buckets | Important | Cash-out detection |
-| VPC flow logs, Route 53 resolver logs | Important | Egress and C2 from workloads |
-
-## Network and remote access
-
-| Source | Tier | Why |
-|---|---|---|
-| DNS query logs (internal resolvers or protective DNS) | Critical | C2, AitM phishing domains, blast-radius sweeps (I-03) |
-| VPN / ZTNA / remote access authentication | Critical | Walked-in via stolen creds; edge devices are a top pushed-in target |
-| Firewall / proxy / secure web gateway (allow + deny) | Important | Egress, downloads, new outbound from servers (D-10) |
-| Edge device admin and config logs (VPN appliances, firewalls) | Important | Pushed-in on devices that can't run EDR |
-| WAF / load balancer logs for internet-facing apps | Important | Probing and exploitation of public apps |
-
-## Other enterprise tools
-
-| Source | Tier | Why |
-|---|---|---|
-| Automation platform (SOAR) audit | Critical | Containment actions must be auditable, and the platform is itself a target |
-| Privileged access / password vault (check-outs, policy changes) | Important | Credential theft at scale |
-| RMM / remote support tools (sessions, new devices) | Important | Common walked-in path via compromised vendor |
-| Help desk tickets (password and MFA resets) | Important | Correlate resets with suspicious sign-ins (D-03) |
-| Code platform and CI/CD (GitHub/GitLab audit, secret scanning) | Important | Secrets, pipeline abuse, OIDC trust abuse |
-| AI agent platforms: prompts, tool calls, actions taken, MCP/connector changes (Copilot, low-code agents, coding assistants, custom agents) | Critical (for agents that can write or execute) | Prompt-injected agents are a pulled-in path; without these logs you can't tell what the agent did or why |
-| Key SaaS (Salesforce, Workday, Google Workspace, etc.) | Important | Cash-out and data theft after identity takeover |
+| Source | Powers |
+|---|---|
+| Microsoft 365 unified audit log / SaaS audit logs | Inbox rules, mass download, external sharing after account takeover |
+| Cloud threat detection findings (e.g. GuardDuty, Defender for Cloud) | Cloud credential misuse, unused-region activity |
+| Cloud identity sign-ins (e.g. AWS IAM Identity Center) | Human access into cloud consoles |
+| Firewall / proxy / web gateway | Server egress, downloads, exfiltration volume |
+| Edge device admin and config logs | Edge device admin or config change detection |
+| WAF / load balancer logs | Probing and exploitation of public apps |
+| Windows Security logs on member servers, Linux auditd | Persistence detections where EDR is weak |
+| AD-to-cloud sync / connector logs | Abuse of identity sync servers |
+| Privileged access vault, RMM tools, help desk tickets | Credential theft at scale, vendor access, reset correlation |
+| Code platform and CI/CD audit | Secrets and pipeline abuse |
+| Key SaaS (CRM, HR, file sharing) | Data theft after identity takeover |
