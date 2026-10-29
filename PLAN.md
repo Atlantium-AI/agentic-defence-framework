@@ -87,4 +87,4 @@ The 23 capabilities behind these are in [checklists/baseline.md](checklists/base
 
 ## Not in the first 90 days
 
-Deliberately deferred: network-layer quarantine, cloud-specific automation, workstation-to-workstation blocking, driver baselines, threat hunting and research agents, purple-team validation, SaaS exfil analytics. All are in [checklists/by-priority.md](checklists/by-priority.md), ready for the next quarter.
+Deliberately deferred: phishing response automation (adjacent; most companies already run a phishing program), network-layer quarantine, cloud-specific automation, workstation-to-workstation blocking, driver baselines, threat hunting and research agents, purple-team validation, SaaS exfil analytics. All are in [checklists/by-priority.md](checklists/by-priority.md), ready for the next quarter.
