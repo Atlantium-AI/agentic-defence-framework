@@ -11,14 +11,14 @@ Template: `reports/machine-speed-containment-90-day-plan.html`. Copy it and keep
 
 In this order:
 1. **Title**: what we'll achieve and by when.
-2. **The story**: how the landscape changed and the gap it creates. A visual (attacker vs. our response) plus three short "what changed" points with one sourced number each.
+2. **The story**: three "what changed" points, each led by one big sourced number (e.g. 29 min breakout, 82% malware-free), then a time-axis visual: attacker vs. human-led response vs. the plan. One source line.
+   - The report goes to many companies: never claim the reader's current state ("our response today"). Say "typical" or "human-led".
 3. **Decision bar**: the one decision needed, with a date.
-4. **Risk grid (RAG)**: 5–7 risks taken from the threat this report addresses, shown today and at each milestone. Each row gets a few words on what moves it.
+4. **Risk grid (RAG)**: 5–7 rows phrased as what the attacker does, in board language ("Gets in with a stolen login", "Encrypts or steals data"), not kill-chain jargon. Columns: typical today and each milestone, plus a few words on what moves it.
    - Drop rows that stay red the whole time, and drop adjacent topics.
    - Keep it honest: a CISO has to defend this grid in front of a board.
-5. **For the board**: 3 lines, one of them the risk-reduction %. Only use a % you can defend, and say how it will be measured.
-6. **Requirements**: outcomes the plan guarantees (e.g. "every automated action is reversible"), not mechanisms.
-7. **Asks** with dates, and **targets** with numbers.
+5. **Tell the board**: 3 lines: the threat with a $ figure, the risk-reduction % and how it's measured, and the safety promise.
+6. **Bottom half, side by side**: "What you need to do" as day-chip rows | "How you'll know it worked" as 2×2 KPI tiles. Then one row of "Guaranteed" check pills (requirements as outcomes, not mechanisms).
 
 ## Engineer pages
 
