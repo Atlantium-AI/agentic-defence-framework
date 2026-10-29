@@ -225,8 +225,8 @@ tables:
 - id: T-15
   name: Cloud accounts and allowed regions
   purpose: Which cloud accounts, subscriptions and regions are in use, so activity elsewhere is a Tier 1 signal.
-  priority: later
-  baseline: false
+  priority: tier1-dependency
+  baseline: true
   used_by: [A-12, D-09]
   sources: [cloud organization APIs, billing]
   script: Pull accounts/subscriptions and the regions with resources; diff weekly.

@@ -33,6 +33,7 @@ Rules for every table:
 | **Approved remote access, RMM and tunneling tools** (T-05) | tier1-dependency |  | weekly diff | Not on the list = unapproved. |
 | **Network segments and quarantine paths** (T-06) | tier1-dependency |  | weekly | Unknown segment = no network-layer quarantine; page instead. |
 | **Change and maintenance windows** (T-07) | tier1-dependency |  | every 15 minutes | No matching change = no suppression. |
+| **Cloud accounts and allowed regions** (T-15) | tier1-dependency | ✓ | weekly | Region not in the list = disallowed. |
 | **Privileged identities** (T-08) | tier2-context |  | daily | n/a (used for context and alerting) |
 | **Service account baselines** (T-09) | tier2-context |  | daily | No baseline = alert, not auto-contain. |
 | **Internet exposure inventory** (T-10) | tier2-context | ✓ | weekly (KEV join daily) | New and unconfirmed exposure = alert. |
@@ -40,7 +41,6 @@ Rules for every table:
 | **Trusted locations and egress IPs** (T-12) | tier2-context |  | weekly | Unknown IP = untrusted. |
 | **VIPs and high-risk users** (T-13) | tier2-context |  | monthly | n/a |
 | **Fleet behavior baselines** (T-14) | later |  | weekly | New = goes to the agent, never auto-contained on its own. |
-| **Cloud accounts and allowed regions** (T-15) | later |  | weekly | Region not in the list = disallowed. |
 
 ## Tier 1 dependencies: automation reads these before acting, so build them first
 
@@ -114,7 +114,7 @@ Subnet to site/type mapping (workstation, server, DMZ, OT, VPN, guest), plus how
 - **Human:** Network owner confirms segment types and the quarantine method per segment.
 - **Refresh:** weekly · **Safe default:** Unknown segment = no network-layer quarantine; page instead.
 - **Columns:** cidr, site, type, quarantine_method, owner
-- **Used by:** Isolate host at the network layer (ACT-02), EDR tampering or sensor gone silent (A-04), Workstation-to-workstation admin protocols (A-10), Asset containment tiers (T-01)
+- **Used by:** Isolate host at the network layer (ACT-02), EDR tampering corroborated by a second signal (A-04), Workstation-to-workstation admin protocols (A-10), Asset containment tiers (T-01)
 
 ### Change and maintenance windows (T-07)
 
@@ -126,7 +126,19 @@ Suppress tamper and silent-sensor alerts during planned work, and only then.
 - **Human:** none beyond normal change approval
 - **Refresh:** every 15 minutes · **Safe default:** No matching change = no suppression.
 - **Columns:** change_id, hosts_or_scope, start, end, owner
-- **Used by:** EDR tampering or sensor gone silent (A-04), Logging or security tool disabled (A-08), Edge device admin or config change (D-12)
+- **Used by:** EDR tampering corroborated by a second signal (A-04), Logging or security tool disabled (A-08), Edge device admin or config change (D-12)
+
+### Cloud accounts and allowed regions (T-15)
+
+Which cloud accounts, subscriptions and regions are in use, so activity elsewhere is a Tier 1 signal.
+
+- **Sources:** cloud organization APIs, billing
+- **Script:** Pull accounts/subscriptions and the regions with resources; diff weekly.
+- **AI agent:** none
+- **Human:** Cloud owner confirms the region allowlist.
+- **Refresh:** weekly · **Safe default:** Region not in the list = disallowed.
+- **Columns:** provider, account_or_subscription, owner, allowed_regions
+- **Used by:** Cloud principal acting from outside its expected environment (A-12), Cloud enumeration burst or new admin grant (D-09)
 
 ## Tier 2 context: detections and the triage agent need these
 
@@ -215,15 +227,3 @@ What is normal across the fleet (drivers, persistence entries, server outbound d
 - **Refresh:** weekly · **Safe default:** New = goes to the agent, never auto-contained on its own.
 - **Columns:** type, value, signer_or_owner, host_count, first_seen
 - **Used by:** New persistence on a server (D-05), New kernel driver not seen in the fleet baseline (D-08), Exfiltration tool on a server (A-16)
-
-### Cloud accounts and allowed regions (T-15)
-
-Which cloud accounts, subscriptions and regions are in use, so activity elsewhere is a Tier 1 signal.
-
-- **Sources:** cloud organization APIs, billing
-- **Script:** Pull accounts/subscriptions and the regions with resources; diff weekly.
-- **AI agent:** none
-- **Human:** Cloud owner confirms the region allowlist.
-- **Refresh:** weekly · **Safe default:** Region not in the list = disallowed.
-- **Columns:** provider, account_or_subscription, owner, allowed_regions
-- **Used by:** Cloud principal acting from outside its expected environment (A-12), Cloud enumeration burst or new admin grant (D-09)

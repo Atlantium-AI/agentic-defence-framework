@@ -10,7 +10,7 @@ capabilities:
   A-03:  # Credential theft behavior on an endpoint
     status: todo
     notes: ''
-  A-04:  # EDR tampering or sensor gone silent
+  A-04:  # EDR tampering corroborated by a second signal
     status: todo
     notes: ''
   A-05:  # Office or email client spawning a script host
@@ -64,7 +64,7 @@ capabilities:
   ACT-05:  # Reset password and MFA methods
     status: todo
     notes: ''
-  ACT-06:  # Revoke cloud credentials
+  ACT-06:  # Revoke cloud credentials (tier-aware)
     status: todo
     notes: ''
   ACT-07:  # Network block (domain, IP, URL)
@@ -80,6 +80,9 @@ capabilities:
     status: todo
     notes: ''
   ACT-11:  # Kill switch for an AI agent
+    status: todo
+    notes: ''
+  ACT-12:  # Restore cloud logging and security services
     status: todo
     notes: ''
   D-01:  # Any high/critical EDR alert not covered by Tier 1
@@ -154,6 +157,9 @@ capabilities:
   F-11:  # Maintain the reference data tables
     status: todo
     notes: ''
+  F-12:  # Keep a containment action log ("did security do this to me?")
+    status: todo
+    notes: ''
   H-01:  # Phishing-resistant MFA for admins
     status: todo
     notes: ''
@@ -170,6 +176,9 @@ capabilities:
     status: todo
     notes: ''
   H-07:  # Least privilege for AI agents
+    status: todo
+    notes: ''
+  H-08:  # Lock down edge device management and VPN sign-in
     status: todo
     notes: ''
   I-01:  # Host evidence pack

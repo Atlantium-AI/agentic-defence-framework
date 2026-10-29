@@ -11,17 +11,20 @@
 | ACT-01 | Isolate host via EDR | action | 0 | H | L | pulled, pushed, post-access | ✓ |
 | ACT-03 | Revoke sessions and tokens | action | 0 | H | L | walked | ✓ |
 | ACT-04 | Disable account | action | 0 | H | L | walked | ✓ |
-| ACT-05 | Reset password and MFA methods | action | 0 | H | L | walked |  |
-| ACT-11 | Kill switch for an AI agent | action | 0 | H | L | pulled | ✓ |
+| ACT-05 | Reset password and MFA methods | action | 0 | H | L | walked | ✓ |
+| ACT-11 | Kill switch for an AI agent | action | 0 | H | L | pulled |  |
+| ACT-12 | Restore cloud logging and security services | action | 0 | H | L | post-access | ✓ |
 | F-01 | Get pre-approved containment authority in writing | foundation | 0 | H | L | post-access | ✓ |
 | F-03 | Build identity containment tiers | foundation | 0 | H | L | walked | ✓ |
+| F-12 | Keep a containment action log ("did security do this to me?") | foundation | 0 | H | L | post-access | ✓ |
 | H-03 | Block Office child processes and script abuse | hardening | 0 | H | L | pulled |  |
 | H-06 | Lock down the EDR console itself | hardening | 0 | H | L | walked |  |
+| H-08 | Lock down edge device management and VPN sign-in | hardening | 0 | H | L | pushed, walked | ✓ |
 | A-01 | Decoy files and canary credentials on endpoints and shares | auto-response | 1 | H | L | post-access | ✓ |
-| A-02 | Canary AD accounts (honey user, honey SPN) | auto-response | 1 | H | L | post-access |  |
+| A-02 | Canary AD accounts (honey user, honey SPN) | auto-response | 1 | H | L | post-access | ✓ |
 | A-03 | Credential theft behavior on an endpoint | auto-response | 1 | H | L | post-access | ✓ |
 | A-05 | Office or email client spawning a script host | auto-response | 1 | H | L | pulled |  |
-| A-08 | Logging or security tool disabled | auto-response | 1 | H | L | post-access |  |
+| A-08 | Logging or security tool disabled | auto-response | 1 | H | L | post-access | ✓ |
 | A-11 | Canary cloud access keys | auto-response | 1 | H | L | post-access |  |
 | A-13 | Machine-speed recon burst | auto-response | 1 | H | L | post-access | ✓ |
 | A-14 | Unapproved remote access or tunneling tool | auto-response | 1 | H | L | walked, post-access |  |
@@ -29,9 +32,9 @@
 | A-16 | Exfiltration tool on a server | auto-response | 1 | H | L | post-access |  |
 | D-01 | Any high/critical EDR alert not covered by Tier 1 | triage-detection | 2 | H | L | pulled, pushed, post-access | ✓ |
 | D-02 | Risky sign-in or session anomaly | triage-detection | 2 | H | L | walked | ✓ |
-| D-03 | New MFA method or help-desk reset followed by a new device | triage-detection | 2 | H | L | walked |  |
+| D-03 | New MFA method or help-desk reset followed by a new device | triage-detection | 2 | H | L | walked | ✓ |
 | D-04 | Server process spawning a shell (exploited service) | triage-detection | 2 | H | L | pushed | ✓ |
-| D-06 | New identity persistence (no-malware access) | triage-detection | 2 | H | L | walked, post-access |  |
+| D-06 | New identity persistence (no-malware access) | triage-detection | 2 | H | L | walked, post-access | ✓ |
 | D-14 | New or unapproved MCP server, agent or AI connector | triage-detection | 2 | H | L | pulled |  |
 | M-01 | Mass session revocation and privileged password reset | manual-action | 2 | H | L | walked, post-access |  |
 | M-02 | Contain a tier C (crown-jewel) server | manual-action | 2 | H | L | pushed, post-access |  |
@@ -42,7 +45,7 @@
 | ID | Capability | Type | Tier | Impact | Effort | Vectors | Baseline |
 |---|---|---|---|---|---|---|---|
 | ACT-02 | Isolate host at the network layer | action | 0 | H | M | post-access |  |
-| ACT-06 | Revoke cloud credentials | action | 0 | H | M | walked, post-access |  |
+| ACT-06 | Revoke cloud credentials (tier-aware) | action | 0 | H | M | walked, post-access | ✓ |
 | ACT-09 | Collect live evidence from a host | action | 0 | H | M | pulled, pushed, post-access |  |
 | F-02 | Build asset containment tiers (can / cannot auto-isolate) | foundation | 0 | H | M | post-access | ✓ |
 | F-04 | Make the action library safe (undo, rate limits, audit) | foundation | 0 | H | M | post-access | ✓ |
@@ -55,13 +58,13 @@
 | H-02 | Block workstation-to-workstation SMB/RDP/WinRM | hardening | 0 | H | M | post-access |  |
 | H-04 | Unique local admin passwords, no standing local admin | hardening | 0 | H | M | post-access |  |
 | H-07 | Least privilege for AI agents | hardening | 0 | H | M | pulled |  |
-| A-04 | EDR tampering or sensor gone silent | auto-response | 1 | H | M | post-access | ✓ |
+| A-04 | EDR tampering corroborated by a second signal | auto-response | 1 | H | M | post-access | ✓ |
 | A-06 | MFA fatigue burst followed by an approval | auto-response | 1 | H | M | walked | ✓ |
 | A-07 | Login page proxied by an AitM kit (canary CSS) | auto-response | 1 | H | M | walked |  |
 | A-09 | One identity fanning out fast | auto-response | 1 | H | M | walked, post-access |  |
 | A-10 | Workstation-to-workstation admin protocols | auto-response | 1 | H | M | post-access |  |
-| A-12 | Cloud principal acting from outside its expected environment | auto-response | 1 | H | M | walked |  |
-| D-12 | Edge device admin or config change | triage-detection | 2 | H | M | pushed |  |
+| A-12 | Cloud principal acting from outside its expected environment | auto-response | 1 | H | M | walked | ✓ |
+| D-12 | Edge device admin or config change | triage-detection | 2 | H | M | pushed | ✓ |
 | D-13 | AI agent doing something it shouldn't | triage-detection | 2 | H | M | pulled |  |
 | I-01 | Host evidence pack | auto-investigation | 2 | H | M | pulled, pushed, post-access |  |
 | I-02 | Identity evidence pack | auto-investigation | 2 | H | M | walked |  |
@@ -74,7 +77,7 @@
 |---|---|---|---|---|---|---|---|
 | ACT-07 | Network block (domain, IP, URL) | action | 0 | M | L | pulled, pushed, post-access | ✓ |
 | ACT-08 | Purge email from all mailboxes | action | 0 | M | L | pulled |  |
-| ACT-10 | Kill process and quarantine file | action | 0 | M | L | pulled, pushed, post-access |  |
+| ACT-10 | Kill process and quarantine file | action | 0 | M | L | pulled, pushed, post-access | ✓ |
 | F-07 | Set up out-of-band comms and break-glass access | foundation | 0 | M | L | post-access |  |
 | F-08 | Measure detect-to-contain time with a quarterly simulation | foundation | 0 | M | L | pulled, pushed, walked |  |
 | D-07 | Kerberoasting / credential spraying | triage-detection | 2 | M | L | post-access |  |

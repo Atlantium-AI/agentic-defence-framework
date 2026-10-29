@@ -7,10 +7,10 @@ Pulled in = user/agent brings it in. Pushed in = exploited service. Walked in = 
 | Vector | Baseline | Total |
 |---|---|---|
 | Pulled in | 7 | 19 |
-| Pushed in | 7 | 15 |
-| Walked in | 7 | 24 |
-| Post-access | 12 | 36 |
-| Attacks on your own AI | 2 | 5 |
+| Pushed in | 10 | 16 |
+| Walked in | 13 | 25 |
+| Post-access | 19 | 38 |
+| Attacks on your own AI | 1 | 5 |
 
 ## Pulled in
 
@@ -37,6 +37,7 @@ Pulled in = user/agent brings it in. Pushed in = exploited service. Walked in = 
 ## Pushed in
 
 - **ACT-01** Isolate host via EDR · _H impact / L effort · Tier 0_
+- **H-08** Lock down edge device management and VPN sign-in · _H impact / L effort · Tier 0_
 - **D-01** Any high/critical EDR alert not covered by Tier 1 · _H impact / L effort · Tier 2_
 - **D-04** Server process spawning a shell (exploited service) · _H impact / L effort · Tier 2_
 - **M-02** Contain a tier C (crown-jewel) server · _H impact / L effort · Tier 2_
@@ -59,13 +60,14 @@ Pulled in = user/agent brings it in. Pushed in = exploited service. Walked in = 
 - **ACT-05** Reset password and MFA methods · _H impact / L effort · Tier 0_
 - **F-03** Build identity containment tiers · _H impact / L effort · Tier 0_
 - **H-06** Lock down the EDR console itself · _H impact / L effort · Tier 0_
+- **H-08** Lock down edge device management and VPN sign-in · _H impact / L effort · Tier 0_
 - **A-14** Unapproved remote access or tunneling tool · _H impact / L effort · Tier 1_
 - **D-02** Risky sign-in or session anomaly · _H impact / L effort · Tier 2_
 - **D-03** New MFA method or help-desk reset followed by a new device · _H impact / L effort · Tier 2_
 - **D-06** New identity persistence (no-malware access) · _H impact / L effort · Tier 2_
 - **M-01** Mass session revocation and privileged password reset · _H impact / L effort · Tier 2_
 - **M-03** Cut third-party and remote access · _H impact / L effort · Tier 2_
-- **ACT-06** Revoke cloud credentials · _H impact / M effort · Tier 0_
+- **ACT-06** Revoke cloud credentials (tier-aware) · _H impact / M effort · Tier 0_
 - **F-06** Get the minimum log sources into the SIEM · _H impact / M effort · Tier 0_
 - **H-01** Phishing-resistant MFA for admins · _H impact / M effort · Tier 0_
 - **A-06** MFA fatigue burst followed by an approval · _H impact / M effort · Tier 1_
@@ -82,7 +84,9 @@ Pulled in = user/agent brings it in. Pushed in = exploited service. Walked in = 
 ## Post-access
 
 - **ACT-01** Isolate host via EDR · _H impact / L effort · Tier 0_
+- **ACT-12** Restore cloud logging and security services · _H impact / L effort · Tier 0_
 - **F-01** Get pre-approved containment authority in writing · _H impact / L effort · Tier 0_
+- **F-12** Keep a containment action log ("did security do this to me?") · _H impact / L effort · Tier 0_
 - **A-01** Decoy files and canary credentials on endpoints and shares · _H impact / L effort · Tier 1_
 - **A-02** Canary AD accounts (honey user, honey SPN) · _H impact / L effort · Tier 1_
 - **A-03** Credential theft behavior on an endpoint · _H impact / L effort · Tier 1_
@@ -97,7 +101,7 @@ Pulled in = user/agent brings it in. Pushed in = exploited service. Walked in = 
 - **M-01** Mass session revocation and privileged password reset · _H impact / L effort · Tier 2_
 - **M-02** Contain a tier C (crown-jewel) server · _H impact / L effort · Tier 2_
 - **ACT-02** Isolate host at the network layer · _H impact / M effort · Tier 0_
-- **ACT-06** Revoke cloud credentials · _H impact / M effort · Tier 0_
+- **ACT-06** Revoke cloud credentials (tier-aware) · _H impact / M effort · Tier 0_
 - **ACT-09** Collect live evidence from a host · _H impact / M effort · Tier 0_
 - **F-02** Build asset containment tiers (can / cannot auto-isolate) · _H impact / M effort · Tier 0_
 - **F-04** Make the action library safe (undo, rate limits, audit) · _H impact / M effort · Tier 0_
@@ -105,7 +109,7 @@ Pulled in = user/agent brings it in. Pushed in = exploited service. Walked in = 
 - **F-11** Maintain the reference data tables · _H impact / M effort · Tier 0_
 - **H-02** Block workstation-to-workstation SMB/RDP/WinRM · _H impact / M effort · Tier 0_
 - **H-04** Unique local admin passwords, no standing local admin · _H impact / M effort · Tier 0_
-- **A-04** EDR tampering or sensor gone silent · _H impact / M effort · Tier 1_
+- **A-04** EDR tampering corroborated by a second signal · _H impact / M effort · Tier 1_
 - **A-09** One identity fanning out fast · _H impact / M effort · Tier 1_
 - **A-10** Workstation-to-workstation admin protocols · _H impact / M effort · Tier 1_
 - **I-01** Host evidence pack · _H impact / M effort · Tier 2_
