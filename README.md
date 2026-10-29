@@ -8,6 +8,7 @@ Agentic attackers go from access to impact in minutes (fastest observed eCrime b
 
 | Path | What it is |
 |---|---|
+| [reports/](reports/machine-speed-containment-90-day-plan.pdf) | Executive report: the 30/60/90 plan for leadership ([PDF](reports/machine-speed-containment-90-day-plan.pdf), [HTML](reports/machine-speed-containment-90-day-plan.html)) |
 | [PLAN.md](PLAN.md) | The 80/20 rollout plan and the **"basics done" bar** for every company |
 | [catalog/capabilities.yaml](catalog/capabilities.yaml) | **Source of truth.** Every capability, scored by impact and effort |
 | [checklists/](checklists/) | Generated from the catalog: build `checklists/` with `python tools/build.py` |

@@ -9,7 +9,7 @@ owners:
 
 identity:
   source_of_truth: <AD | Entra | Okta>
-  flows: <e.g. AD -> Okta -> apps>
+  flows: <how identities flow from the source of truth to apps>
   mfa: <methods in use; phishing-resistant for admins? y/n>
 
 endpoint:
@@ -17,14 +17,14 @@ endpoint:
   coverage_pct: <n>
   prevent_mode: <y/n/partial>
   anti_tamper: <y/n>
-  other_agents: <e.g. Tanium, Velociraptor, Sysmon>
+  other_agents: <endpoint management, IR or logging agents>
 
 siem:
   product: <product>
   critical_log_gaps: []   # from checklists/critical-log-sources.md
 
 automation:
-  platform: <e.g. Tines, Sentinel playbooks, cloud-native>
+  platform: <SOAR, SIEM playbooks or cloud-native automation>
   # Action readiness is tracked in scorecard.yaml (ACT-01 to ACT-11)
 
 cloud:

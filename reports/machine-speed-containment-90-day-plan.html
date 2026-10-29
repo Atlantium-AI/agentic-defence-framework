@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Machine-Speed Containment | Atlantium AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --night: #030507;
+    --card: #0e1521;
+    --line-dark: #1d283a;
+    --atlantic: #0d4896;
+    --atlantic-700: #0a3a7a;
+    --sky: #5699f0;
+    --teal: #2bd4bd;
+    --teal-deep: #3f8f9a;
+    --ink: #0f172a;
+    --text: #1e293b;
+    --muted: #64748b;
+    --line: #e2e8f0;
+    --paper: #ffffff;
+    --tint: #f4f8fd;
+    --amber: #f2c45b;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    margin: 0;
+    background: #dfe5ee;
+    color: var(--text);
+    font: 400 10.5pt/1.55 Inter, system-ui, sans-serif;
+  }
+  h1, h2, h3 { font-family: "Plus Jakarta Sans", Inter, system-ui, sans-serif; color: var(--ink); margin: 0; }
+  h2 { font-size: 19pt; font-weight: 800; letter-spacing: -0.01em; }
+  h3 { font-size: 11.5pt; font-weight: 700; }
+  p { margin: 0 0 8pt; }
+  strong { color: var(--ink); font-weight: 600; }
+
+  .page {
+    width: 8.5in; min-height: 11in; margin: 0.35in auto; padding: 0.7in 0.75in 0.85in;
+    background: var(--paper); position: relative; overflow: hidden;
+    box-shadow: 0 6px 30px rgba(15, 23, 42, 0.12);
+  }
+  .page + .page { page-break-before: always; }
+  .footer {
+    position: absolute; left: 0.75in; right: 0.75in; bottom: 0.4in;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 8pt; color: var(--muted); border-top: 1px solid var(--line); padding-top: 8pt;
+  }
+  .footer b { color: var(--atlantic); font-weight: 600; }
+  .eyebrow {
+    display: inline-block; font: 600 8pt Inter, sans-serif; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--teal-deep); margin-bottom: 6pt;
+  }
+  .section { margin-top: 18pt; }
+  .section > h2 { margin-bottom: 8pt; }
+  .lede { font-size: 11.5pt; color: #334155; max-width: 6.3in; }
+
+  /* Cover */
+  .cover {
+    background: radial-gradient(1200px 600px at 85% -10%, rgba(13, 72, 150, 0.55), transparent 60%),
+                radial-gradient(800px 500px at -10% 110%, rgba(43, 212, 189, 0.16), transparent 60%),
+                var(--night);
+    color: #e1e7ef; display: flex; flex-direction: column; padding: 0.8in 0.85in;
+  }
+  .brand { display: flex; align-items: center; gap: 10pt; }
+  .brand img { width: 44px; height: 44px; object-fit: contain; }
+  .brand span { font: 700 14pt "Plus Jakarta Sans", sans-serif; color: var(--sky); letter-spacing: -0.01em; }
+  .cover .pill {
+    margin-top: 1.6in; align-self: flex-start; border: 1px solid #22314a; border-radius: 999px;
+    padding: 4pt 11pt; font-size: 8.5pt; color: #cbd5e1; background: rgba(14, 21, 33, 0.7);
+  }
+  .cover h1 {
+    color: #fff; font-size: 40pt; line-height: 1.05; font-weight: 800; letter-spacing: -0.02em; margin-top: 16pt;
+  }
+  .cover h1 em { font-style: normal; color: var(--teal); }
+  .cover .sub { font-size: 13pt; color: #94a3b8; margin-top: 14pt; max-width: 5.6in; line-height: 1.45; }
+  .cover-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12pt; margin-top: 0.9in; }
+  .cover-stats div { border-top: 2px solid var(--atlantic); padding-top: 8pt; }
+  .cover-stats b { display: block; font: 800 22pt "Plus Jakarta Sans", sans-serif; color: #fff; }
+  .cover-stats span { font-size: 8.5pt; color: #94a3b8; }
+  .cover-foot {
+    margin-top: auto; display: flex; justify-content: space-between; font-size: 8.5pt; color: #64748b;
+    border-top: 1px solid #1d283a; padding-top: 10pt;
+  }
+  .cover-foot b { color: var(--sky); font-weight: 600; }
+
+  /* Components */
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8pt; margin: 12pt 0 4pt; }
+  .kpi { background: var(--tint); border: 1px solid #dbe6f5; border-radius: 10px; padding: 10pt 11pt; }
+  .kpi b { display: block; font: 800 18pt "Plus Jakarta Sans", sans-serif; color: var(--atlantic); line-height: 1.1; }
+  .kpi span { font-size: 8.3pt; color: var(--muted); line-height: 1.35; display: block; margin-top: 3pt; }
+  .note { font-size: 8pt; color: var(--muted); }
+
+  .callout {
+    border-left: 3px solid var(--teal); background: #f0fbf9; padding: 9pt 12pt; border-radius: 0 8px 8px 0; margin: 10pt 0;
+  }
+  .callout p:last-child { margin: 0; }
+
+  .tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8pt; margin-top: 8pt; }
+  .tier { border: 1px solid var(--line); border-radius: 10px; padding: 10pt 11pt; }
+  .tier .tag { font: 700 8pt Inter, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; }
+  .tier h3 { margin: 3pt 0 4pt; }
+  .tier p { font-size: 9pt; color: #475569; margin: 0; }
+  .t0 .tag { color: var(--muted); }
+  .t1 { border-color: #b9d2f3; background: var(--tint); }
+  .t1 .tag { color: var(--atlantic); }
+  .t2 { border-color: #b5ece4; background: #f2fcfa; }
+  .t2 .tag { color: var(--teal-deep); }
+
+  .vectors { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8pt; margin-top: 8pt; }
+  .vector { background: var(--card); color: #cbd5e1; border-radius: 10px; padding: 10pt 11pt; }
+  .vector h3 { color: #fff; font-size: 11pt; }
+  .vector .k { color: var(--teal); font: 700 8pt Inter, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; }
+  .vector p { font-size: 8.8pt; margin: 4pt 0 0; color: #a3b1c6; }
+
+  .timeline { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9pt; margin-top: 10pt; }
+  .phase { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+  .phase header { padding: 9pt 11pt; color: #fff; }
+  .phase:nth-child(1) header { background: var(--atlantic-700); }
+  .phase:nth-child(2) header { background: var(--atlantic); }
+  .phase:nth-child(3) header { background: linear-gradient(120deg, var(--atlantic), var(--teal-deep)); }
+  .phase header small { font: 600 8pt Inter, sans-serif; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.8; }
+  .phase header h3 { color: #fff; font-size: 12pt; margin-top: 2pt; }
+  .phase ul { margin: 0; padding: 9pt 11pt 4pt 24pt; font-size: 8.8pt; flex: 1; }
+  .phase li { margin-bottom: 4pt; }
+  .phase .exit { margin: 0 9pt 9pt; padding: 7pt 9pt; background: var(--tint); border-radius: 8px; font-size: 8.3pt; color: #334155; }
+  .phase .exit b { color: var(--atlantic); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 8.8pt; margin-top: 8pt; }
+  th { text-align: left; font: 600 7.8pt Inter, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+       border-bottom: 1.5px solid var(--ink); padding: 5pt 6pt; }
+  td { border-bottom: 1px solid var(--line); padding: 6pt; vertical-align: top; }
+  td:first-child { font-weight: 600; color: var(--ink); }
+  .badge { display: inline-block; font: 600 7.8pt Inter, sans-serif; padding: 2pt 7pt; border-radius: 999px; white-space: nowrap; }
+  .auto { background: #dff7f3; color: #0f766e; }
+  .rec { background: #e6eefb; color: var(--atlantic); }
+  .human { background: #fdf3dc; color: #92600a; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14pt; }
+  .checks { list-style: none; padding: 0; margin: 6pt 0 0; font-size: 9.2pt; }
+  .checks li { padding: 5pt 0 5pt 20pt; position: relative; border-bottom: 1px solid var(--line); }
+  .checks li::before {
+    content: ""; position: absolute; left: 2pt; top: 9pt; width: 9pt; height: 9pt; border-radius: 3px;
+    background: var(--teal); box-shadow: inset 0 0 0 2px #fff, 0 0 0 1px var(--teal);
+  }
+  .deferred { display: flex; flex-wrap: wrap; gap: 5pt; margin-top: 8pt; }
+  .deferred span { font-size: 8.3pt; border: 1px solid var(--line); border-radius: 999px; padding: 3pt 9pt; color: #475569; }
+
+  .closing { background: var(--night); color: #cbd5e1; border-radius: 12px; padding: 16pt 18pt; margin-top: 18pt; }
+  .closing h3 { color: #fff; font-size: 13pt; }
+  .closing p { margin: 6pt 0 0; font-size: 9.5pt; }
+  .closing a { color: var(--teal); text-decoration: none; font-weight: 600; }
+
+  @page { size: Letter; margin: 0; }
+  @media print {
+    body { background: none; }
+    .page { margin: 0; box-shadow: none; width: 8.5in; height: 11in; min-height: 11in; }
+  }
+  @media screen and (max-width: 860px) {
+    .page { width: auto; min-height: 0; margin: 0; padding: 32px 16px 64px; box-shadow: none; }
+    .kpis, .tiers, .vectors, .timeline, .grid2, .cover-stats { grid-template-columns: 1fr; }
+    .cover h1 { font-size: 30pt; }
+    .cover .pill { margin-top: 48px; }
+    table { display: block; overflow-x: auto; }
+    .footer { position: static; margin-top: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 1. Cover -->
+<section class="page cover">
+  <div class="brand">
+    <img src="https://atlantiumai.io/assets/Circuit_Emblem_with_Gradient_Accent_Cropped-removebg-preview_1756327886569-BO1xM7Y2.png" alt="Atlantium AI">
+    <span>Atlantium AI</span>
+  </div>
+  <div class="pill">Agentic Defence Framework · Executive Plan</div>
+  <h1>Machine-speed <em>containment</em><br>in 90 days</h1>
+  <p class="sub">A 30/60/90-day plan to detect, contain and investigate AI-driven attacks before they become incidents, using the security tools you already own.</p>
+  <div class="cover-stats">
+    <div><b>8</b><span>attack patterns contained automatically, in seconds</span></div>
+    <div><b>&lt; 5 min</b><span>from alert to AI-assisted investigation</span></div>
+    <div><b>~55–60%</b><span>of intrusions stopped at machine speed (modeled)</span></div>
+  </div>
+  <div class="cover-foot"><span>Prepared by <b>Atlantium AI</b> · atlantiumai.io</span><span>October 2026</span></div>
+</section>
+
+<!-- 2. Executive summary -->
+<section class="page">
+  <span class="eyebrow">Executive summary</span>
+  <h2>Attackers now move at machine speed. Our response has to as well.</h2>
+  <p class="lede" style="margin-top:8pt">AI-driven attackers can go from first access to impact in minutes. CrowdStrike's fastest observed eCrime breakout time is 27 seconds. When every containment decision waits for a person, defenders lose that race by design.</p>
+  <p>This plan pre-approves a small set of <strong>reversible</strong> containment actions, fired automatically by <strong>high-confidence</strong> detections, on <strong>low-risk targets</strong> first. An <strong>AI triage agent</strong> investigates everything else in minutes. It runs on tools you already own: EDR, SIEM, identity provider, cloud consoles and an automation platform.</p>
+
+  <div class="kpis">
+    <div class="kpi"><b>8</b><span>attack patterns contained automatically by day 90</span></div>
+    <div class="kpi"><b>&lt; 5 min</b><span>alert to agent investigation and recommendation</span></div>
+    <div class="kpi"><b>&lt; 5 min</b><span>detect-to-contain target, proven by simulation</span></div>
+    <div class="kpi"><b>~55–60%</b><span>intrusions stopped at machine speed, vs. ~10–20% typical today</span></div>
+  </div>
+  <p class="note">Impact figures are modeled estimates from initial-access mix and coverage; the day-90 simulated attack replaces them with measured results.</p>
+
+  <div class="section">
+    <span class="eyebrow">How attacks get in</span>
+    <h2>Three ways in, one response rule</h2>
+    <div class="vectors">
+      <div class="vector"><span class="k">Pulled in</span><h3>Brought in by a user or AI agent</h3><p>Phishing, downloads, fake fixes, a prompt-injected AI agent. Starts on workstations.</p></div>
+      <div class="vector"><span class="k">Pushed in</span><h3>Exploited from the internet</h3><p>VPNs, firewalls, web apps. The top breach vector. Starts on servers and edge devices.</p></div>
+      <div class="vector"><span class="k">Walked in</span><h3>Valid access, misused</h3><p>Stolen passwords and sessions, MFA abuse, vendor access. Starts in the identity provider.</p></div>
+    </div>
+    <div class="callout"><p><strong>Once inside, attackers get the keys, blind the guards, move, then cash out.</strong> Our rule is simple: <strong>cut off whatever they're using.</strong> If it's a host, isolate it. If it's an identity, kill its sessions. If it's a cloud key, revoke it.</p></div>
+  </div>
+
+  <div class="footer"><span><b>Atlantium AI</b> · Machine-speed containment in 90 days</span><span>atlantiumai.io · 2</span></div>
+</section>
+
+<!-- 3. Approach and automation -->
+<section class="page">
+  <div>
+    <span class="eyebrow">The approach</span>
+    <h2>Three tiers of response</h2>
+    <div class="tiers">
+      <div class="tier t0"><span class="tag">Foundations</span><h3>Permission and visibility</h3><p>A signed containment policy, every asset and identity tagged with what automation may do, critical logs flowing, and a log of every action taken.</p></div>
+      <div class="tier t1"><span class="tag">Tier 1 · Automated</span><h3>Contain in seconds</h3><p>Near-certain detections trigger reversible actions automatically, on low-risk targets only, after two weeks in recommend-only mode.</p></div>
+      <div class="tier t2"><span class="tag">Tier 2 · AI triage</span><h3>Investigate in minutes</h3><p>An AI agent investigates everything else and recommends. It earns autonomy one action at a time, at ≥ 95% agreement with analysts.</p></div>
+    </div>
+  </div>
+  <div class="section">
+    <span class="eyebrow">Automation at day 90</span>
+    <h2>What runs on its own, and what doesn't</h2>
+    <table>
+      <thead><tr><th>Detection</th><th>Response</th><th>Day 90</th></tr></thead>
+      <tbody>
+        <tr><td>Decoy, fake credential or decoy account touched</td><td>Isolate machine, sign the user out everywhere</td><td><span class="badge auto">Automatic</span></td></tr>
+        <tr><td>Credential theft on a machine</td><td>Isolate, sign out, reset credentials, block attacker sites</td><td><span class="badge auto">Automatic</span></td></tr>
+        <tr><td>MFA fatigue, then an approval</td><td>Sign out everywhere, reset password and MFA</td><td><span class="badge auto">Automatic</span></td></tr>
+        <tr><td>Machine-speed reconnaissance</td><td>Isolate workstation, sign the session out</td><td><span class="badge auto">Automatic</span></td></tr>
+        <tr><td>Ransomware preparation</td><td>Isolate, disable the user, block attacker sites</td><td><span class="badge auto">Automatic</span></td></tr>
+        <tr><td>Cloud logging or security tools turned off</td><td>Turn them back on, revoke the actor's cloud access</td><td><span class="badge auto">Automatic</span></td></tr>
+        <tr><td>Stolen cloud credentials in use</td><td>Revoke active cloud sessions, page on-call</td><td><span class="badge auto">Automatic</span></td></tr>
+        <tr><td>Security tool tampering + a second signal</td><td>Sign out, attempt isolation, page on-call</td><td><span class="badge auto">Automatic</span></td></tr>
+        <tr><td>Everything else serious</td><td>AI agent investigates and recommends; analyst decides</td><td><span class="badge rec">Recommend</span></td></tr>
+        <tr><td>Critical servers, executives, service accounts, root and break-glass</td><td>Page a human immediately</td><td><span class="badge human">Human only</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="footer"><span><b>Atlantium AI</b> · Machine-speed containment in 90 days</span><span>atlantiumai.io · 3</span></div>
+</section>
+
+<!-- 4. The plan -->
+<section class="page">
+  <span class="eyebrow">The 30 / 60 / 90 day plan</span>
+  <h2>From permission to proven, in three phases</h2>
+  <p class="lede" style="margin-top:6pt">Phases are balanced by effort. The first month is light on engineering because signatures, owners and inventories take calendar time.</p>
+  <div class="timeline">
+    <div class="phase">
+      <header><small>Days 1–30</small><h3>See and authorize</h3></header>
+      <ul>
+        <li>Containment policy signed by leadership</li>
+        <li>Every workstation marked safe to auto-isolate; servers default to page-a-human</li>
+        <li>Action log live: the help desk can answer "did security do this to me?"</li>
+        <li>Critical logs confirmed flowing</li>
+        <li>Internet-facing systems inventoried; edge management taken off the internet</li>
+        <li>Decoy files, fake credentials and decoy accounts deployed</li>
+        <li>Read-only AI agent reports blind spots</li>
+      </ul>
+      <div class="exit"><b>Exit:</b> policy signed, workstations tagged, first blind spot report delivered</div>
+    </div>
+    <div class="phase">
+      <header><small>Days 31–60</small><h3>Build actions, learn the noise</h3></header>
+      <ul>
+        <li>Response actions built and tested with one-click undo: isolate, stop a process, block a site, sign out everywhere, disable, reset credentials</li>
+        <li>EDR in block mode everywhere, coverage gaps closed</li>
+        <li>Decoys go fully automatic</li>
+        <li>Other detections run in recommend-only mode</li>
+        <li>AI triage agent writes up every high-severity alert, risky sign-in and new MFA registration</li>
+      </ul>
+      <div class="exit"><b>Exit:</b> every action proven, decoys automatic, every high alert investigated in minutes</div>
+    </div>
+    <div class="phase">
+      <header><small>Days 61–90</small><h3>Cloud, edge, go automatic</h3></header>
+      <ul>
+        <li>Azure and AWS: disabled logging restored automatically, stolen cloud credentials cut off</li>
+        <li>Edge device admin and config changes investigated</li>
+        <li>Detections with a clean record go automatic for low-risk targets</li>
+        <li>Phishing-resistant MFA for every admin</li>
+        <li>Safe simulated attack measures detect-to-contain</li>
+      </ul>
+      <div class="exit"><b>Exit:</b> 8 detections automatic, time to contain measured, board scorecard</div>
+    </div>
+  </div>
+
+  <div class="footer"><span><b>Atlantium AI</b> · Machine-speed containment in 90 days</span><span>atlantiumai.io · 4</span></div>
+</section>
+
+<!-- 5. Safety and cloud -->
+<section class="page">
+  <span class="eyebrow">Safety by design</span>
+  <h2>Automation that can't take the business down</h2>
+  <div class="grid2" style="margin-top:6pt">
+    <ul class="checks">
+      <li><strong>Recommend first.</strong> Nothing acts on its own until it has run two clean weeks in recommend-only mode.</li>
+      <li><strong>Low-risk targets only.</strong> Workstations, standard users and human cloud accounts. Critical systems always go to a person.</li>
+      <li><strong>One-click undo and bulk undo</strong> on every action, plus rate limits that page on-call when hit.</li>
+      <li><strong>A full action log</strong>, so anyone can find out in a minute whether security acted on them, and why.</li>
+    </ul>
+    <ul class="checks">
+      <li><strong>Our tools can't cause an outage.</strong> A circuit breaker pauses automation during an EDR vendor outage, and tampering alerts need a second signal.</li>
+      <li><strong>Attackers can't turn it against us.</strong> Mass decoy hits become one investigation, not mass isolation.</li>
+      <li><strong>Prompt injection never triggers containment.</strong> Text planted for our AI agent goes to an analyst, not to an action.</li>
+      <li><strong>The AI earns autonomy</strong> one action at a time: ≥ 95% agreement with analysts, zero harmful calls.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <span class="eyebrow">Cloud, safely</span>
+    <h2>Matching the action to the identity</h2>
+    <table>
+      <thead><tr><th>Cloud identity</th><th>Automatic</th><th>Recommended</th></tr></thead>
+      <tbody>
+        <tr><td>People (users, human roles)</td><td>Revoke sessions, deactivate keys, deny-all policy</td><td>—</td></tr>
+        <tr><td>Workloads (apps, CI/CD, services)</td><td>Revoke active sessions: workloads get fresh credentials, the attacker's copy dies</td><td>Deactivate keys, deny-all</td></tr>
+        <tr><td>Root, break-glass, org admin, security tooling</td><td>—</td><td><span class="badge human">Human only</span></td></tr>
+        <tr><td>Anyone who turned logging off</td><td>Logging restored, always</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <span class="eyebrow">Deliberately deferred to next quarter</span>
+    <div class="deferred">
+      <span>AI agent kill switch</span><span>Phishing response automation</span><span>Network-level quarantine</span>
+      <span>Cloud server isolation</span><span>SaaS-level detections</span><span>Data-theft analytics</span>
+      <span>Threat hunting</span><span>Hypervisor monitoring</span>
+    </div>
+    <p class="note" style="margin-top:6pt">These are the expensive 20%. They return next quarter with 90 days of data behind them.</p>
+  </div>
+
+  <div class="footer"><span><b>Atlantium AI</b> · Machine-speed containment in 90 days</span><span>atlantiumai.io · 5</span></div>
+</section>
+
+<!-- 6. Asks, metrics, closing -->
+<section class="page">
+  <span class="eyebrow">Making it happen</span>
+  <h2 style="margin-bottom:12pt">What we need, and how you'll know it worked</h2>
+  <div class="grid2">
+    <div>
+      <span class="eyebrow">What we need from leadership</span>
+      <table>
+        <tbody>
+          <tr><td>Sign the containment policy</td><td>Day 30</td></tr>
+          <tr><td>Mandate phishing-resistant MFA for admins</td><td>Day 1</td></tr>
+          <tr><td>Edge device management off the internet</td><td>Days 1–30</td></tr>
+          <tr><td>15 minutes per app owner: "can we isolate this server?"</td><td>Days 31–60</td></tr>
+          <tr><td>Read-only API access for agents; automation platform access</td><td>Day 1</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <span class="eyebrow">How you'll know it worked</span>
+      <table>
+        <tbody>
+          <tr><td>EDR coverage in block mode</td><td>&gt; 95%</td></tr>
+          <tr><td>Attack patterns contained automatically</td><td>8</td></tr>
+          <tr><td>Alert to investigation</td><td>&lt; 5 min</td></tr>
+          <tr><td>Detect-to-contain (simulation)</td><td>&lt; 5 min</td></tr>
+          <tr><td>Admins on phishing-resistant MFA</td><td>100%</td></tr>
+          <tr><td>Edge management exposed to internet</td><td>0</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <span class="eyebrow">The finish line</span>
+    <h2>"Basics done" means yes to all of these</h2>
+    <div class="grid2">
+      <ul class="checks">
+        <li>Automated containment is pre-approved in writing</li>
+        <li>Every host, identity and cloud account is tagged with what automation may do</li>
+        <li>EDR blocks on &gt; 95% of hosts and critical logs are flowing</li>
+        <li>Every action has undo, rate limits and a searchable log</li>
+      </ul>
+      <ul class="checks">
+        <li>Decoys contain whoever touches them</li>
+        <li>Eight attack patterns are contained in seconds</li>
+        <li>Edge devices are locked down and patched within 72 hours</li>
+        <li>Everything else gets an AI investigation in under 5 minutes</li>
+      </ul>
+    </div>
+  </div>
+  <div class="closing">
+    <h3>Get 80% of the protection for 20% of the effort, then build on it.</h3>
+    <p>Atlantium AI helps security teams adopt AI safely and defend against it. Learn more at <a href="https://atlantiumai.io">atlantiumai.io</a>.</p>
+  </div>
+  <div class="footer"><span><b>Atlantium AI</b> · Machine-speed containment in 90 days</span><span>atlantiumai.io · 6</span></div>
+</section>
+</body>
+</html>
