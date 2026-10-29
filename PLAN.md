@@ -34,17 +34,21 @@ Changes from the first draft: EDR prevent-mode enforcement moved to days 31–60
 
 - [ ] Containment authority policy drafted in week 1, signed by day 30 (F-01)
 - [ ] Workstations tagged auto-isolate on day 1; servers default to contain-lite ([checklist](checklists/asset-containment-tiers.md)) (F-02)
-- [ ] Identity tiers, including cloud principals (F-03)
+- [ ] Identity tiers defined **by rule**, checked live before any action: admin roles and groups (IdP, AD, cloud), non-human accounts (service, sync, workload), plus a short fixed list of break-glass and root accounts (F-03)
 - [ ] Containment action log: the help desk can answer "did security do this to me?" (F-12)
 - [ ] "Must have" log sources flowing with lag measured; "Collect now" by day 60 ([checklist](checklists/critical-log-sources.md)) (F-06)
-- [ ] Internet exposure inventory + 72-hour patch SLA for known-exploited bugs (F-09)
-- [ ] Edge lockdown: management interfaces off the internet, VPN through SSO + MFA ([edge plan](checklists/edge-devices.md)) (H-08)
-- [ ] Decoy files, canary credentials and canary AD accounts deployed in recommend-only mode (A-01, A-02)
+- [ ] Internet exposure inventory kept as a **triage knowledge base**: vendor, version, owner, exposed services (F-09)
+- [ ] Edge device admin and config changes to the triage agent (D-12)
+- [ ] Decoys deployed in recommend-only mode, each with its trigger (A-01, A-02):
+  - [ ] Decoy files: a content-reading program opens one (ignore AV, backup, indexing)
+  - [ ] Canary credentials: any sign-in attempt that uses them
+  - [ ] Canary AD accounts: any logon or Kerberos ticket request
 - [ ] Phishing-resistant MFA rollout started for admins (H-01)
-- [ ] **Blind Spot Detector** agent running read-only ([agents](agents/README.md))
+- [ ] **Blind Spot Detector** first: record the tech stack, then check logs and detections against it ([agents](agents/README.md))
+- [ ] **Triage** agent read-only from day 14: investigates high alerts and writes up cases; analysts act
 - [ ] Data tables started: asset tiers, identity tiers, exceptions, decoy registry, exposure inventory, cloud accounts and regions ([data tables](checklists/data-tables.md))
 
-**Exit:** policy signed · workstations tagged · action log live · first blind spot report delivered.
+**Exit:** first blind spot report · triage agent writing cases · policy signed · workstations tagged · action log live.
 
 ## Days 31–60: Build the actions, learn the noise
 
@@ -53,11 +57,11 @@ Changes from the first draft: EDR prevent-mode enforcement moved to days 31–60
 - [ ] Action safety: tier checks, undo and bulk undo, rate limits per rule and action type that page P1 when hit (F-04)
 - [ ] Actions: isolate host via EDR, kill process, network block, revoke sessions, disable account, reset password and MFA (ACT-01, ACT-10, ACT-07, ACT-03, ACT-04, ACT-05)
 - [ ] EDR prevent mode and anti-tamper enforced, coverage gaps closed (F-05)
-- [ ] Decoys and canary accounts switch to **automatic** after 2 clean weeks (A-01, A-02), with the mass-hit breaker in place
+- [ ] Decoys and canary accounts switch to **automatic** after 2 clean weeks (A-01, A-02), with the mass-hit pause in place (decoys firing on more than 3 machines in 15 minutes stop auto-isolation and page a human)
 - [ ] Recommend-only: credential theft (A-03), MFA fatigue (A-06), machine-speed recon on Windows and Linux (A-13), ransomware precursors (A-15)
 - [ ] **Triage** agent in recommend mode: EDR high/critical alerts, risky sign-ins, new MFA method or help-desk reset, server spawning a shell (D-01, D-02, D-03, D-04)
 - [ ] **Alert Tuner** starts drafting exceptions from day 31
-- [ ] **Data Steward** proposes server tiers; app owners answer one yes/no question per server
+- [ ] **Data Steward** proposes server tiers; app owners answer one question per server: "can we isolate it automatically?"
 
 **Exit:** all actions tested end to end · decoys automatic · every high alert gets an agent write-up.
 
@@ -67,7 +71,6 @@ Changes from the first draft: EDR prevent-mode enforcement moved to days 31–60
 
 - [ ] Cloud actions: revoke cloud credentials (tier-aware), restore cloud logging (ACT-06, ACT-12)
 - [ ] Cloud detections: logging or security tool disabled (A-08), cloud credentials used outside the provider or in unused regions (A-12), new privileges, keys, root or break-glass use (D-06)
-- [ ] Edge device admin and config changes to the triage agent (D-12)
 - [ ] EDR tampering **corroborated by a second signal**, with the fleet circuit breaker (A-04)
 - [ ] AI agent inventory: agents that can write or execute (F-10)
 - [ ] Phishing-resistant MFA complete for all admins (H-01)
