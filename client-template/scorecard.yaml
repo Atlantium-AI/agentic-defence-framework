@@ -1,0 +1,210 @@
+# Scorecard for <client>. Status: todo | in-progress | done | n/a
+# Generated entries are added by tools/build.py; edit status and notes by hand.
+capabilities:
+  A-01:  # Decoy files and canary credentials on endpoints and shares
+    status: todo
+    notes: ''
+  A-02:  # Canary AD accounts (honey user, honey SPN)
+    status: todo
+    notes: ''
+  A-03:  # Credential theft behavior on an endpoint
+    status: todo
+    notes: ''
+  A-04:  # EDR tampering or sensor gone silent
+    status: todo
+    notes: ''
+  A-05:  # Office or email client spawning a script host
+    status: todo
+    notes: ''
+  A-06:  # MFA fatigue burst followed by an approval
+    status: todo
+    notes: ''
+  A-07:  # Login page proxied by an AitM kit (canary CSS)
+    status: todo
+    notes: ''
+  A-08:  # Logging or security tool disabled
+    status: todo
+    notes: ''
+  A-09:  # One identity fanning out fast
+    status: todo
+    notes: ''
+  A-10:  # Workstation-to-workstation admin protocols
+    status: todo
+    notes: ''
+  A-11:  # Canary cloud access keys
+    status: todo
+    notes: ''
+  A-12:  # Cloud principal acting from outside its expected environment
+    status: todo
+    notes: ''
+  A-13:  # Machine-speed recon burst
+    status: todo
+    notes: ''
+  A-14:  # Unapproved remote access or tunneling tool
+    status: todo
+    notes: ''
+  A-15:  # Ransomware precursors
+    status: todo
+    notes: ''
+  A-16:  # Exfiltration tool on a server
+    status: todo
+    notes: ''
+  ACT-01:  # Isolate host via EDR
+    status: todo
+    notes: ''
+  ACT-02:  # Isolate host at the network layer
+    status: todo
+    notes: ''
+  ACT-03:  # Revoke sessions and tokens
+    status: todo
+    notes: ''
+  ACT-04:  # Disable account
+    status: todo
+    notes: ''
+  ACT-05:  # Reset password and MFA methods
+    status: todo
+    notes: ''
+  ACT-06:  # Revoke cloud credentials
+    status: todo
+    notes: ''
+  ACT-07:  # Block IOC fleet-wide
+    status: todo
+    notes: ''
+  ACT-08:  # Purge email from all mailboxes
+    status: todo
+    notes: ''
+  ACT-09:  # Collect live evidence from a host
+    status: todo
+    notes: ''
+  ACT-10:  # Kill process and quarantine file
+    status: todo
+    notes: ''
+  ACT-11:  # Kill switch for an AI agent
+    status: todo
+    notes: ''
+  D-01:  # Any high/critical EDR alert not covered by Tier 1
+    status: todo
+    notes: ''
+  D-02:  # Risky sign-in or session anomaly
+    status: todo
+    notes: ''
+  D-03:  # New MFA method or help-desk reset followed by a new device
+    status: todo
+    notes: ''
+  D-04:  # Server process spawning a shell (exploited service)
+    status: todo
+    notes: ''
+  D-05:  # New persistence on a server
+    status: todo
+    notes: ''
+  D-06:  # New identity persistence (no-malware access)
+    status: todo
+    notes: ''
+  D-07:  # Kerberoasting / credential spraying
+    status: todo
+    notes: ''
+  D-08:  # New kernel driver not seen in the fleet baseline
+    status: todo
+    notes: ''
+  D-09:  # Cloud enumeration burst or new admin grant
+    status: todo
+    notes: ''
+  D-10:  # Server making a new outbound connection
+    status: todo
+    notes: ''
+  D-11:  # Mass file download or external sharing in SaaS
+    status: todo
+    notes: ''
+  D-12:  # Edge device admin or config change
+    status: todo
+    notes: ''
+  D-13:  # AI agent doing something it shouldn't
+    status: todo
+    notes: ''
+  D-14:  # New or unapproved MCP server, agent or AI connector
+    status: todo
+    notes: ''
+  F-01:  # Get pre-approved containment authority in writing
+    status: todo
+    notes: ''
+  F-02:  # Build asset containment tiers (can / cannot auto-isolate)
+    status: todo
+    notes: ''
+  F-03:  # Build identity containment tiers
+    status: todo
+    notes: ''
+  F-04:  # Make the action library safe (undo, rate limits, audit)
+    status: todo
+    notes: ''
+  F-05:  # Close EDR coverage and policy gaps
+    status: todo
+    notes: ''
+  F-06:  # Get the minimum log sources into the SIEM
+    status: todo
+    notes: ''
+  F-07:  # Set up out-of-band comms and break-glass access
+    status: todo
+    notes: ''
+  F-08:  # Measure detect-to-contain time with a quarterly simulation
+    status: todo
+    notes: ''
+  F-09:  # Know what's exposed to the internet
+    status: todo
+    notes: ''
+  F-10:  # Inventory AI agents, their identities and their tools
+    status: todo
+    notes: ''
+  F-11:  # Maintain the reference data tables
+    status: todo
+    notes: ''
+  H-01:  # Phishing-resistant MFA for admins
+    status: todo
+    notes: ''
+  H-02:  # Block workstation-to-workstation SMB/RDP/WinRM
+    status: todo
+    notes: ''
+  H-03:  # Block Office child processes and script abuse
+    status: todo
+    notes: ''
+  H-04:  # Unique local admin passwords, no standing local admin
+    status: todo
+    notes: ''
+  H-05:  # Driver protection (HVCI + vulnerable driver blocklist)
+    status: todo
+    notes: ''
+  H-06:  # Lock down the EDR console itself
+    status: todo
+    notes: ''
+  H-07:  # Least privilege for AI agents
+    status: todo
+    notes: ''
+  I-01:  # Host evidence pack
+    status: todo
+    notes: ''
+  I-02:  # Identity evidence pack
+    status: todo
+    notes: ''
+  I-03:  # Blast radius sweep
+    status: todo
+    notes: ''
+  I-04:  # Weekly persistence stack-and-diff sweep
+    status: todo
+    notes: ''
+  I-05:  # Initial access classification
+    status: todo
+    notes: ''
+  M-01:  # Mass session revocation and privileged password reset
+    status: todo
+    notes: ''
+  M-02:  # Contain a tier C (crown-jewel) server
+    status: todo
+    notes: ''
+  M-03:  # Cut third-party and remote access
+    status: todo
+    notes: ''
+  M-04:  # Domain-wide credential reset (krbtgt x2, Tier 0 accounts)
+    status: todo
+    notes: ''
+  M-05:  # Segment-wide internet egress kill switch
+    status: todo
+    notes: ''

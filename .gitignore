@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+
+# Client data never lives in this repo
+clients/
+*.client.*

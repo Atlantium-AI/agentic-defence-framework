@@ -1,0 +1,237 @@
+# Reference data tables: the lookups that detections and automation read at run time.
+#
+# Maintenance model: scripts build, agents propose, humans approve, automation reads.
+#
+# Fields
+#   id             Stable code (T-xx)
+#   name           Readable name
+#   purpose        Why it exists
+#   priority       tier1-dependency  = Tier 1 automation reads it before acting; must exist first
+#                  tier2-context     = triage agent / detections need it for context or tuning
+#                  later             = the remaining 20%
+#   baseline       true = required for "basics done"
+#   used_by        Capability codes that read this table
+#   sources        Where the data comes from (authoritative first)
+#   script         What the deterministic job does
+#   agent          What the AI agent does (proposes only; never loosens containment on its own)
+#   human          What a person must do
+#   refresh        How often the script runs
+#   safe_default   What automation does when a row is missing or stale
+#   columns        Minimum columns
+
+tables:
+
+- id: T-01
+  name: Asset containment tiers
+  purpose: Which hosts automation may isolate (A), contain-lite (B), or never isolate (C).
+  priority: tier1-dependency
+  baseline: true
+  used_by: [F-02, ACT-01, ACT-02, A-01, A-03, A-13, A-15]
+  sources: [EDR inventory, AD / IdP device objects, cloud inventory, CMDB if trusted, running services and logon telemetry]
+  script: >
+    Pull all hosts from the EDR. Workstations become A by OS type. Tier C is set by signal (DC role,
+    hypervisor, IdP connector, security tooling, backup, OT segment). Everything else is B.
+    Push the tier as an EDR tag.
+  agent: Classify servers the rules can't (what is this box, from services, listening ports and logons); draft the yes/no question for the app owner.
+  human: App owners answer the isolate yes/no question; security approves any move to C. Quarterly re-attestation for B and C.
+  refresh: daily
+  safe_default: Missing or unknown = B (contain-lite + page).
+  columns: [hostname, tier, role, owner, reason, source, confirmed_date, last_seen]
+
+- id: T-02
+  name: Identity containment tiers
+  purpose: Which identities automation may disable/revoke on its own vs. needs approval.
+  priority: tier1-dependency
+  baseline: true
+  used_by: [F-03, ACT-03, ACT-04, ACT-05, A-06, A-09]
+  sources: [identity source of truth (AD / Entra / Okta), HR feed, IdP admin roles, service account OUs and naming, sign-in telemetry]
+  script: >
+    Join IdP users with HR. Humans in HR = A. Admin roles, executives = B. Break-glass, service
+    accounts, sync/connector accounts = C. Accounts not in HR become "suspected non-human" for review.
+  agent: Classify suspected service accounts from behavior (no MFA, logs on only from servers, fixed schedule) and find an owner from logon hosts and group memberships.
+  human: Approve every move to C; quarterly review of the C list.
+  refresh: daily
+  safe_default: Missing = B (revoke sessions + page; disable needs a click).
+  columns: [identity, tier, type (human/service/agent/break-glass), owner, reason, last_reviewed]
+
+- id: T-03
+  name: Containment exceptions and allowlists
+  purpose: Every suppression in one place (sanctioned dump tools, scanners, backup jobs, pentest IPs, IT jump hosts).
+  priority: tier1-dependency
+  baseline: true
+  used_by: [A-01, A-03, A-09, A-10, A-13, A-15, A-16]
+  sources: [requests from IT and security, tuning during the 2-week recommend-only period]
+  script: Expire entries past their end date and alert the owner 14 days before. Report the entries that suppressed something this week.
+  agent: When a recommend-only rule fires on something benign, draft the narrowest possible exception (hash + host + account, not a wildcard).
+  human: Security approves every entry. No entry without an owner, a reason and an expiry (max 12 months).
+  refresh: daily (expiry check)
+  safe_default: Not on the list = no exception.
+  columns: [rule, match (hash/path/account/host/ip), owner, reason, created, expires]
+
+- id: T-04
+  name: Decoy and canary registry
+  purpose: Where every decoy file, canary account and canary key lives, so a hit is instantly recognized and decoys stay healthy.
+  priority: tier1-dependency
+  baseline: true
+  used_by: [A-01, A-02, A-11]
+  sources: [deployment job output, AD (canary accounts), cloud IAM (canary keys)]
+  script: Deploy decoys, record path and hash per host, and check weekly that every decoy still exists, canary accounts are still disabled for logon and audit (SACL) is still on.
+  agent: Suggest new decoy placements that fit each environment (fake configs and scripts that look native).
+  human: Approve decoy content and placement policy once.
+  refresh: weekly health check
+  safe_default: Any access to a path or account in the registry = Tier 1 hit.
+  columns: [type, location, host_or_account, deployed, last_verified]
+
+- id: T-05
+  name: Approved remote access, RMM and tunneling tools
+  purpose: Anything not on this list triggers the unapproved remote access tool detection.
+  priority: tier1-dependency
+  baseline: true
+  used_by: [A-14, M-03]
+  sources: [IT, EDR software inventory, procurement/contracts]
+  script: Stack remote access tool executions fleet-wide and diff against the list.
+  agent: Research newly seen tools (vendor, purpose, abuse history) and recommend approve or remove.
+  human: IT owner approves additions.
+  refresh: weekly diff
+  safe_default: Not on the list = unapproved.
+  columns: [tool, approved_use, hosts_or_groups, owner, reviewed]
+
+- id: T-06
+  name: Network segments and quarantine paths
+  purpose: Subnet to site/type mapping (workstation, server, DMZ, OT, VPN, guest), plus how to network-quarantine a host in each segment.
+  priority: tier1-dependency
+  baseline: true
+  used_by: [ACT-02, A-04, A-10, T-01]
+  sources: [IPAM, DHCP scopes, firewall and NAC config, cloud VPC/VNet config]
+  script: Pull DHCP scopes and cloud network ranges; flag IPs seen in telemetry that fall in no known segment.
+  agent: Propose segment type for unknown ranges from the hosts seen in them.
+  human: Network owner confirms segment types and the quarantine method per segment.
+  refresh: weekly
+  safe_default: Unknown segment = no network-layer quarantine; page instead.
+  columns: [cidr, site, type, quarantine_method, owner]
+
+- id: T-07
+  name: Change and maintenance windows
+  purpose: Suppress tamper and silent-sensor alerts during planned work, and only then.
+  priority: tier1-dependency
+  baseline: false
+  used_by: [A-04, A-08, D-12]
+  sources: [change management system, EDR upgrade schedules]
+  script: Pull approved changes (host, start, end) into a lookup the automation checks.
+  agent: Match an alert to an open change ticket and say so in the case.
+  human: none beyond normal change approval
+  refresh: every 15 minutes
+  safe_default: No matching change = no suppression.
+  columns: [change_id, hosts_or_scope, start, end, owner]
+
+- id: T-08
+  name: Privileged identities
+  purpose: Every admin across AD, IdP, cloud, EDR, SIEM and SaaS, so a new one is a detection and an alert on one is higher priority.
+  priority: tier2-context
+  baseline: true
+  used_by: [D-06, H-01, H-06, M-01]
+  sources: [AD privileged groups, IdP admin roles, cloud role assignments, EDR/SIEM console admins, key SaaS admin roles]
+  script: Snapshot all privileged assignments daily; diff = new privilege alert.
+  agent: Explain each diff (who granted it, ticket, is it expected).
+  human: Quarterly access review.
+  refresh: daily
+  safe_default: n/a (used for context and alerting)
+  columns: [identity, system, role, granted_by, granted_date]
+
+- id: T-09
+  name: Service account baselines
+  purpose: Where each service account normally logs on and from what; the basis for fan-out and anomaly detections without drowning in noise.
+  priority: tier2-context
+  baseline: false
+  used_by: [A-09, D-07, T-02]
+  sources: [logon telemetry (30 days), AD]
+  script: Build per-account set of source and destination hosts and logon types over 30 days, rolling.
+  agent: Triage logons outside the baseline.
+  human: none
+  refresh: daily
+  safe_default: No baseline = alert, not auto-contain.
+  columns: [account, usual_sources, usual_destinations, logon_types, last_built]
+
+- id: T-10
+  name: Internet exposure inventory
+  purpose: What's reachable from the internet, who owns it, and whether it has known-exploited vulnerabilities.
+  priority: tier2-context
+  baseline: true
+  used_by: [F-09, D-04, D-12, I-03]
+  sources: [external attack surface scan, cloud public IPs and load balancers, DNS zones, firewall NAT rules, vulnerability scanner, CISA KEV feed]
+  script: Weekly external scan and cloud pull; diff against last week; join with vulnerability scan results and the KEV feed.
+  agent: Triage new exposures (what is it, who likely owns it) and summarize KEV hits with urgency.
+  human: Owner confirms each new exposure is intended.
+  refresh: weekly (KEV join daily)
+  safe_default: New and unconfirmed exposure = alert.
+  columns: [asset, ip_or_hostname, port_service, owner, known_exploited_vulns, first_seen]
+
+- id: T-11
+  name: AI agent and MCP inventory
+  purpose: Every AI agent, MCP server and AI connector, with its identity, permissions and owner; anything not listed is unapproved.
+  priority: tier2-context
+  baseline: true
+  used_by: [F-10, ACT-11, D-13, D-14, H-07]
+  sources: [EDR (agent processes, MCP config files, IDE extensions), OAuth app grants in the IdP/M365/Google, low-code agent platform admin APIs, procurement]
+  script: Weekly discovery sweep across all sources; diff against the approved list.
+  agent: Research new agents/MCP servers (publisher, requested permissions, data reach) and recommend approve or remove.
+  human: Owner and security approve additions; anything that can write or execute needs a named owner.
+  refresh: weekly
+  safe_default: Not on the list = unapproved (triage detection fires).
+  columns: [agent, type, identity, can_write_or_execute, tools_and_data, owner, logs_in_siem, approved]
+
+- id: T-12
+  name: Trusted locations and egress IPs
+  purpose: Corporate egress IPs, VPN ranges and sanctioned cloud/proxy IPs, so sign-in and cloud detections can tell inside from outside.
+  priority: tier2-context
+  baseline: false
+  used_by: [D-02, A-12]
+  sources: [firewall NAT config, VPN/ZTNA config, IdP named locations]
+  script: Pull and sync to IdP named locations and SIEM lookups.
+  agent: none
+  human: Network owner confirms quarterly.
+  refresh: weekly
+  safe_default: Unknown IP = untrusted.
+  columns: [cidr, type, owner]
+
+- id: T-13
+  name: VIPs and high-risk users
+  purpose: Executives, finance approvers, IT admins and their assistants get faster triage and B-tier identity handling.
+  priority: tier2-context
+  baseline: false
+  used_by: [D-02, T-02]
+  sources: [HR org chart, finance approval roles]
+  script: Pull titles and roles from HR monthly.
+  agent: none
+  human: Security confirms the list quarterly.
+  refresh: monthly
+  safe_default: n/a
+  columns: [identity, reason]
+
+- id: T-14
+  name: Fleet behavior baselines
+  purpose: What is normal across the fleet (drivers, persistence entries, server outbound destinations, business file-sharing domains), so new things stand out.
+  priority: later
+  baseline: false
+  used_by: [D-05, D-08, D-10, A-16, I-04]
+  sources: [EDR / Sysmon telemetry, DNS and proxy logs]
+  script: Stack counts across the fleet weekly; anything seen on fewer than N hosts or new this week goes to the diff.
+  agent: Triage the weekly diff (LOLDrivers, signer reputation, destination reputation).
+  human: none beyond triage escalations
+  refresh: weekly
+  safe_default: New = goes to the agent, never auto-contained on its own.
+  columns: [type, value, signer_or_owner, host_count, first_seen]
+
+- id: T-15
+  name: Cloud accounts and allowed regions
+  purpose: Which cloud accounts, subscriptions and regions are in use, so activity elsewhere is a Tier 1 signal.
+  priority: later
+  baseline: false
+  used_by: [A-12, D-09]
+  sources: [cloud organization APIs, billing]
+  script: Pull accounts/subscriptions and the regions with resources; diff weekly.
+  agent: none
+  human: Cloud owner confirms the region allowlist.
+  refresh: weekly
+  safe_default: Region not in the list = disallowed.
+  columns: [provider, account_or_subscription, owner, allowed_regions]

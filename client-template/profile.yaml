@@ -1,0 +1,42 @@
+# Client profile. Copy client-template/ into the client's PRIVATE repo or folder.
+# Keep answers short; this is a map of where things are, not documentation.
+
+client: <name>
+updated: YYYY-MM-DD
+owners:
+  security_lead: <name>
+  containment_approver: <name>   # signs F-01
+
+identity:
+  source_of_truth: <AD | Entra | Okta>
+  flows: <e.g. AD -> Okta -> apps>
+  mfa: <methods in use; phishing-resistant for admins? y/n>
+
+endpoint:
+  edr: <product>
+  coverage_pct: <n>
+  prevent_mode: <y/n/partial>
+  anti_tamper: <y/n>
+  other_agents: <e.g. Tanium, Velociraptor, Sysmon>
+
+siem:
+  product: <product>
+  critical_log_gaps: []   # from checklists/critical-log-sources.md
+
+automation:
+  platform: <e.g. Tines, Sentinel playbooks, cloud-native>
+  # Action readiness is tracked in scorecard.yaml (ACT-01 to ACT-11)
+
+cloud:
+  providers: []   # aws, azure, gcp
+  m365: <y/n>
+
+ai_agents: []   # name, identity, can_write_or_execute (y/n), owner, logs_in_siem (y/n)
+
+approved_remote_access_tools: []   # anything else triggers A-14
+
+triage_agent:
+  platform: <tbd>
+  mode: recommend   # recommend | auto-per-action
+
+asset_tiers: asset-tiers.csv

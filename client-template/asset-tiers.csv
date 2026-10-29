@@ -1,0 +1,4 @@
+hostname,tier,role,owner,reason,source,confirmed_date
+example-ws-001,A,workstation,,default workstation,edr-os-type,
+example-dc-01,C,domain controller,IT Infra,identity infrastructure,auto-signal,
+example-app-01,B,production app server,App Team,default server (owner not yet asked),default,

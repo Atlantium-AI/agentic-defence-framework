@@ -1,0 +1,1033 @@
+# Agentic Defence Framework: capability catalog (source of truth)
+#
+# Fields
+#   id          Stable code. Prefix = type: F foundation, ACT action, A auto-response,
+#               D triage detection, I investigation, M manual action, H hardening
+#   name        Readable name. Always shown next to the code in generated docs
+#   type        foundation | action | auto-response | triage-detection | auto-investigation | manual-action | hardening
+#   tier        0 = foundation, 1 = deterministic + automated, 2 = triage agent
+#   vectors     pulled | pushed | walked | post-access (what happens after any entry)
+#   stage       entry | keys | guards | move | cashout | any
+#   impact      H | M | L    How much attacker speed/blast radius this removes
+#   effort      L | M | H    Typical effort at a company with EDR + SIEM + IdP
+#   baseline    true = part of the "basics done" bar every company must reach
+#   ai          true = covers attacks on the company's own AI agents
+#   trigger     What fires it (detections)
+#   action      What happens (automated, suggested, or manual)
+#   uses        Response actions (ACT-xx) this trigger fires or recommends
+#   guardrails  What keeps it safe
+#   done_when   How we know it's done at a client
+#
+# Keep entries technology-agnostic. Per-tech implementation notes go in the
+# client's private repo until reused at 2+ clients.
+
+capabilities:
+
+# --------------------------------------------------------------------------
+# TIER 0: FOUNDATIONS. Nothing automated is safe without these.
+# --------------------------------------------------------------------------
+
+- id: F-01
+  name: Get pre-approved containment authority in writing
+  type: foundation
+  tier: 0
+  vectors: [post-access]
+  stage: any
+  impact: H
+  effort: L
+  baseline: true
+  action: >
+    One-page policy signed by the CISO/IT lead: which actions run automatically, on which
+    asset/identity tiers, who gets paged, and SLA for human review. Without this, every
+    containment waits for a meeting.
+  done_when: Signed policy lists each Tier 1 action and the asset/identity tiers it applies to.
+
+- id: F-02
+  name: Build asset containment tiers (can / cannot auto-isolate)
+  type: foundation
+  tier: 0
+  vectors: [post-access]
+  stage: any
+  impact: H
+  effort: M
+  baseline: true
+  action: >
+    Classify every endpoint into A (auto-isolate), B (contain-lite + page human), or
+    C (never auto-isolate, page immediately). Default: all workstations = A on day one.
+    See checklists/asset-containment-tiers.md.
+  done_when: Every EDR-managed host has a tier tag in the EDR, and the default for untagged servers is B.
+
+- id: F-03
+  name: Build identity containment tiers
+  type: foundation
+  tier: 0
+  vectors: [walked]
+  stage: any
+  impact: H
+  effort: L
+  baseline: true
+  action: >
+    Tag identities as auto-containable (standard humans, AI agent identities) vs.
+    human-approval (break-glass, service accounts, executives, IdP admins). Build from IdP
+    group membership plus a service-account naming/OU sweep.
+  done_when: Exclusion group exists in the IdP and automation reads it before acting.
+
+- id: F-04
+  name: Make the action library safe (undo, rate limits, audit)
+  type: foundation
+  tier: 0
+  vectors: [post-access]
+  stage: any
+  impact: H
+  effort: M
+  baseline: true
+  action: >
+    Every response action (ACT-xx) runs through the automation platform with: tier check at
+    action time, one-click undo, rate limit (max N auto-isolations per hour, then require a
+    human), and a full audit log. A runaway rule must never cause the outage itself.
+  done_when: Every baseline action and its undo has been run end to end against a test host and test user in the last 90 days.
+
+- id: F-05
+  name: Close EDR coverage and policy gaps
+  type: foundation
+  tier: 0
+  vectors: [pulled, pushed, post-access]
+  stage: guards
+  impact: H
+  effort: M
+  baseline: true
+  action: >
+    Compare EDR inventory to AD/IdP/DHCP/cloud inventories to find unmanaged hosts. Enforce
+    prevent mode (not detect-only), anti-tamper with an uninstall password, and review exclusions.
+  done_when: Coverage > 95% of known hosts; no detect-only policies on production without a written reason.
+
+- id: F-06
+  name: Get the minimum log sources into the SIEM
+  type: foundation
+  tier: 0
+  vectors: [pulled, pushed, walked]
+  stage: any
+  impact: H
+  effort: M
+  baseline: true
+  action: >
+    Collect the "Critical" tier of checklists/critical-log-sources.md: EDR, identity sign-ins
+    and audit (AD, Entra, Okta), M365/email, DNS, cloud control plane (Azure, AWS), remote
+    access, and AI agent platforms. Near real-time (< 5 min lag).
+  done_when: Every Critical source is present and its ingest lag is measured on a dashboard.
+
+- id: F-07
+  name: Set up out-of-band comms and break-glass access
+  type: foundation
+  tier: 0
+  vectors: [post-access]
+  stage: any
+  impact: M
+  effort: L
+  baseline: true
+  action: >
+    Out-of-band channel (e.g. Signal group) for when email/Slack/Teams is compromised, and
+    break-glass admin accounts for the IdP, EDR console and SIEM, stored offline and tested.
+  done_when: Break-glass login tested in the last 90 days; OOB channel has the IR roster.
+
+- id: F-08
+  name: Measure detect-to-contain time with a quarterly simulation
+  type: foundation
+  tier: 0
+  vectors: [pulled, pushed, walked]
+  stage: any
+  impact: M
+  effort: L
+  baseline: true
+  action: >
+    Run a small atomic test set (decoy file read, LSASS-access sim, Office spawning a
+    script host, recon burst, MFA burst on a test user) and record the time from first event to containment.
+  done_when: Mean time to contain (MTTC) for Tier 1 scenarios is recorded each quarter and under 5 minutes.
+
+- id: F-09
+  name: Know what's exposed to the internet
+  type: foundation
+  tier: 0
+  vectors: [pushed]
+  stage: entry
+  impact: H
+  effort: M
+  baseline: true
+  action: >
+    Inventory of every internet-facing service (VPN, firewalls, web apps, RDP, file transfer,
+    email), refreshed by external scanning. Patch SLA of 48-72h for known-exploited (e.g. CISA KEV)
+    vulnerabilities on these assets; alert on newly exposed services.
+  done_when: Exposure list exists with owners, and known-exploited vulnerabilities on it are tracked to the SLA.
+
+- id: F-10
+  name: Inventory AI agents, their identities and their tools
+  type: foundation
+  tier: 0
+  vectors: [pulled]
+  stage: entry
+  impact: H
+  effort: M
+  baseline: true
+  ai: true
+  action: >
+    List every AI agent, copilot, coding assistant and MCP server/connector in use (sanctioned and
+    discovered from EDR/SaaS/OAuth data): what identity it runs as, what data and tools it can reach,
+    whether it can act (send, write, execute), and where its logs go.
+  done_when: Inventory exists, every agent with write/execute ability has a named owner, and its logs reach the SIEM.
+
+- id: F-11
+  name: Maintain the reference data tables
+  type: foundation
+  tier: 0
+  vectors: [post-access]
+  stage: any
+  impact: H
+  effort: M
+  baseline: true
+  action: >
+    Build and keep fresh the lookups automation reads at action time (asset and identity tiers,
+    exceptions, canary registry, approved tools, network segments, and more). Scripts build, agents
+    propose, humans approve, automation reads. See checklists/data-tables.md.
+  done_when: Every baseline table exists with an automated refresh, a safe default, and a health alert when it goes stale.
+
+# --------------------------------------------------------------------------
+# RESPONSE ACTIONS: build each once per client; every trigger reuses them.
+# --------------------------------------------------------------------------
+
+- id: ACT-01
+  name: Isolate host via EDR
+  type: action
+  tier: 0
+  vectors: [pulled, pushed, post-access]
+  stage: any
+  impact: H
+  effort: L
+  baseline: true
+  action: EDR network containment that keeps the EDR channel open for investigation. Tier-aware (A = isolate, B = page, C = never).
+  done_when: Automation can isolate and release a test host; release is one click.
+
+- id: ACT-02
+  name: Isolate host at the network layer
+  type: action
+  tier: 0
+  vectors: [post-access]
+  stage: guards
+  impact: H
+  effort: M
+  baseline: true
+  action: >
+    Quarantine that doesn't depend on the host's own agent: NAC/switch port, internal firewall
+    or ZTNA block by IP/MAC, wireless de-auth, or cloud security group swap. Needed when EDR is
+    tampered with or the host is unmanaged. Start with the cheapest path that exists at the client.
+  done_when: At least one network-layer quarantine path tested for workstations; servers documented per segment.
+
+- id: ACT-03
+  name: Revoke sessions and tokens
+  type: action
+  tier: 0
+  vectors: [walked]
+  stage: keys
+  impact: H
+  effort: L
+  baseline: true
+  action: Revoke all IdP sessions and refresh tokens for a user (and downstream SaaS sessions where supported, e.g. universal logout).
+  done_when: Revocation tested on a test user and the effect verified in a signed-in app.
+
+- id: ACT-04
+  name: Disable account
+  type: action
+  tier: 0
+  vectors: [walked]
+  stage: keys
+  impact: H
+  effort: L
+  baseline: true
+  action: Disable the identity in the source of truth and confirm it propagates (AD -> IdP -> SaaS). Identity-tier aware.
+  done_when: Disable and re-enable tested; propagation time measured.
+
+- id: ACT-05
+  name: Reset password and MFA methods
+  type: action
+  tier: 0
+  vectors: [walked]
+  stage: keys
+  impact: H
+  effort: L
+  baseline: true
+  action: Force password reset and remove recently added MFA methods, with out-of-band re-enrollment through the help desk.
+  done_when: Runs from automation; help desk re-enrollment procedure documented.
+
+- id: ACT-06
+  name: Revoke cloud credentials
+  type: action
+  tier: 0
+  vectors: [walked, post-access]
+  stage: keys
+  impact: H
+  effort: M
+  baseline: true
+  action: Attach a deny-all policy to the cloud principal, revoke active sessions, and deactivate its access keys/secrets.
+  done_when: Tested against a test principal in each cloud the client uses.
+
+- id: ACT-07
+  name: Block IOC fleet-wide
+  type: action
+  tier: 0
+  vectors: [pulled, pushed, post-access]
+  stage: any
+  impact: M
+  effort: L
+  baseline: true
+  action: Push a hash, domain, URL or IP block to EDR, DNS/proxy and email gateway in one step.
+  done_when: One call blocks a test domain across all three layers.
+
+- id: ACT-08
+  name: Purge email from all mailboxes
+  type: action
+  tier: 0
+  vectors: [pulled]
+  stage: entry
+  impact: M
+  effort: L
+  baseline: true
+  action: Find and remove a message (by sender, subject, URL or attachment hash) from every mailbox.
+  done_when: Tested on a test message sent to several mailboxes.
+
+- id: ACT-09
+  name: Collect live evidence from a host
+  type: action
+  tier: 0
+  vectors: [pulled, pushed, post-access]
+  stage: any
+  impact: H
+  effort: M
+  baseline: true
+  action: >
+    On containment, pull a triage package (running processes, network connections, memory if
+    feasible, key artifacts, autoruns) through the EDR or IR agent before anyone reboots or reimages.
+  done_when: Package collected automatically from a test host and attached to the case.
+
+- id: ACT-10
+  name: Kill process and quarantine file
+  type: action
+  tier: 0
+  vectors: [pulled, pushed, post-access]
+  stage: any
+  impact: M
+  effort: L
+  baseline: false
+  action: Terminate a process tree and quarantine its binary via the EDR. Least disruptive option for tier B/C hosts.
+  done_when: Callable from automation.
+
+- id: ACT-11
+  name: Kill switch for an AI agent
+  type: action
+  tier: 0
+  vectors: [pulled]
+  stage: any
+  impact: H
+  effort: L
+  baseline: true
+  ai: true
+  action: >
+    Disable the agent's identity, revoke its OAuth grants/tokens, and disconnect or block its MCP
+    servers/connectors, without touching the human users who work with it.
+  done_when: Kill switch documented and tested for every agent in the inventory that can write or execute.
+
+# --------------------------------------------------------------------------
+# TIER 1: DETERMINISTIC DETECTION -> AUTOMATED RESPONSE
+# Start every one in recommend-only mode for ~2 weeks, then flip to auto.
+# --------------------------------------------------------------------------
+
+- id: A-01
+  name: Decoy files and canary credentials on endpoints and shares
+  type: auto-response
+  tier: 1
+  vectors: [post-access]
+  stage: keys
+  impact: H
+  effort: L
+  baseline: true
+  trigger: >
+    Read of a decoy file (passwords.txt, fake unattend.xml/.env/web.config, admin scripts)
+    or use of a canary credential/key embedded in it. Near-zero false positives.
+  action: Contain the host (tier-aware) and revoke the sessions of the user who read it.
+  uses: [ACT-01, ACT-03, ACT-09]
+  guardrails: Exclude backup/AV/indexer processes from the read trigger. Decoy text may ask an AI agent to stop and report, nothing destructive.
+  done_when: Decoys on 100% of servers and a sample of workstations and shares; a test read triggers containment.
+
+- id: A-02
+  name: Canary AD accounts (honey user, honey SPN)
+  type: auto-response
+  tier: 1
+  vectors: [post-access]
+  stage: keys
+  impact: H
+  effort: L
+  baseline: true
+  trigger: Any authentication attempt or Kerberos service ticket request for a canary account.
+  action: Contain the source host (tier-aware); open a P1.
+  uses: [ACT-01, ACT-09]
+  guardrails: Canary accounts are disabled for interactive logon and excluded from legitimate scripts.
+  done_when: At least one canary user and one canary SPN exist, and a test Kerberoast triggers the alert.
+
+- id: A-03
+  name: Credential theft behavior on an endpoint
+  type: auto-response
+  tier: 1
+  vectors: [post-access]
+  stage: keys
+  impact: H
+  effort: L
+  baseline: true
+  trigger: >
+    High-confidence EDR alerts for LSASS dumping (incl. comsvcs MiniDump), SAM/SYSTEM hive
+    save, DCSync from a non-DC, browser credential store theft.
+  action: Contain the host, revoke sessions for every user logged on to it, force password reset.
+  uses: [ACT-01, ACT-03, ACT-05, ACT-09]
+  guardrails: Allowlist sanctioned memory-dump tools by hash and signer; tier C gets block-lateral + page.
+  done_when: Automation fires on the vendor's credential-theft alert categories; tested with a safe simulation.
+
+- id: A-04
+  name: EDR tampering or sensor gone silent
+  type: auto-response
+  tier: 1
+  vectors: [post-access]
+  stage: guards
+  impact: H
+  effort: M
+  baseline: true
+  trigger: >
+    EDR tamper alert, service stop, or a known-vulnerable driver load (LOLDrivers match).
+    OR the sensor heartbeat is missing while the host is still seen on the network (DHCP/DNS/firewall/IdP).
+  action: Quarantine at a layer the attacker can't reach from the host; disable the logged-on user.
+  uses: [ACT-02, ACT-04]
+  guardrails: Suppress during planned maintenance windows and EDR upgrade waves.
+  done_when: Heartbeat-gap rule exists and has a network-layer quarantine path for at least workstations.
+
+- id: A-05
+  name: Office or email client spawning a script host
+  type: auto-response
+  tier: 1
+  vectors: [pulled]
+  stage: entry
+  impact: H
+  effort: L
+  baseline: true
+  trigger: Outlook/Word/Excel/PowerPoint/OneNote (or new Outlook's webview) spawning powershell, cmd, wscript, cscript, mshta, rundll32, regsvr32.
+  action: Isolate the host, revoke the user's sessions, purge the email from all mailboxes.
+  uses: [ACT-01, ACT-03, ACT-08, ACT-09]
+  guardrails: Tune for 2 weeks for known macros/add-ins. Prefer also blocking via prevention policy (H-03).
+  done_when: Rule in auto mode with fewer than 1 false positive per month.
+
+- id: A-06
+  name: MFA fatigue burst followed by an approval
+  type: auto-response
+  tier: 1
+  vectors: [walked]
+  stage: entry
+  impact: H
+  effort: M
+  baseline: true
+  trigger: N or more denied/ignored MFA pushes for one user within a short window, followed by an approval from an unfamiliar IP/device.
+  action: Revoke all sessions, remove MFA methods registered in the last 24h, force reset, notify the user out of band.
+  uses: [ACT-03, ACT-05]
+  guardrails: Identity tier check (F-03).
+  done_when: Rule tested against a test user on the client's IdP.
+
+- id: A-07
+  name: Login page proxied by an AitM kit (canary CSS)
+  type: auto-response
+  tier: 1
+  vectors: [walked]
+  stage: entry
+  impact: H
+  effort: M
+  baseline: false
+  trigger: The IdP sign-in page's custom branding loads a tracking resource; the referrer is not the IdP's own domain.
+  action: Alert P1. Correlate users who signed in from the proxied page in that window; revoke their sessions and new MFA methods; block the phishing domain.
+  uses: [ACT-03, ACT-05, ACT-07]
+  guardrails: Verify the technique works with each IdP's custom branding before relying on it.
+  done_when: Canary in place and tested by loading the page through a test reverse proxy.
+
+- id: A-08
+  name: Logging or security tool disabled
+  type: auto-response
+  tier: 1
+  vectors: [post-access]
+  stage: guards
+  impact: H
+  effort: L
+  baseline: true
+  trigger: Security log cleared, audit policy changed, cloud trail stopped/deleted/updated, cloud threat detection disabled, IdP log streaming changes.
+  action: P1 page. In cloud, cut off the acting principal.
+  uses: [ACT-06]
+  guardrails: Change-ticket allowlist for the handful of admins who legitimately change logging.
+  done_when: Rule exists for every log source in F-06.
+
+- id: A-09
+  name: One identity fanning out fast
+  type: auto-response
+  tier: 1
+  vectors: [walked, post-access]
+  stage: move
+  impact: H
+  effort: M
+  baseline: false
+  trigger: One account authenticating to more than N distinct hosts within M minutes (network/RDP logons), or a burst of failed logons/Kerberos requests.
+  action: Human accounts get disabled with sessions killed. Service accounts page a human with a one-click disable.
+  uses: [ACT-03, ACT-04]
+  guardrails: Baseline N and M per account class for 2 weeks; exclude scanners, backup and deployment tools by account.
+  done_when: Thresholds tuned and the rule in auto mode for human accounts.
+
+- id: A-10
+  name: Workstation-to-workstation admin protocols
+  type: auto-response
+  tier: 1
+  vectors: [post-access]
+  stage: move
+  impact: H
+  effort: M
+  baseline: false
+  trigger: SMB admin shares, WinRM, RDP, PsExec, WMI remote exec between two workstations.
+  action: Isolate the source workstation.
+  uses: [ACT-01]
+  guardrails: Only meaningful once H-02 blocks it by policy, which makes every hit an anomaly. Exclude IT jump hosts.
+  done_when: Hardening in place and residual hits go to auto-contain.
+
+- id: A-11
+  name: Canary cloud access keys
+  type: auto-response
+  tier: 1
+  vectors: [post-access]
+  stage: keys
+  impact: H
+  effort: L
+  baseline: false
+  trigger: Any API call using a canary cloud key (planted in decoy files, CI configs, dev laptops).
+  action: P1 alert with source IP; if the source is internal, isolate that host.
+  uses: [ACT-01]
+  done_when: Canary keys planted alongside A-01 decoys where the client uses cloud.
+
+- id: A-12
+  name: Cloud principal acting from outside its expected environment
+  type: auto-response
+  tier: 1
+  vectors: [walked]
+  stage: keys
+  impact: H
+  effort: M
+  baseline: false
+  trigger: Instance/workload credentials used from outside the cloud provider, or any activity in a region the client doesn't use.
+  action: Cut off the principal.
+  uses: [ACT-06]
+  guardrails: Region allowlist confirmed with cloud owners; preferably enforced with an org-level policy.
+  done_when: Cloud threat detection on in all accounts/regions, with these findings wired to the action.
+
+- id: A-13
+  name: Machine-speed recon burst
+  type: auto-response
+  tier: 1
+  vectors: [post-access]
+  stage: move
+  impact: H
+  effort: L
+  baseline: true
+  trigger: >
+    One process tree or user session runs N or more distinct discovery commands (whoami, net
+    user/group, nltest, systeminfo, ipconfig, quser, arp, route, klist, AD/LDAP queries, cloud
+    List/Describe) within 60 seconds. Humans don't type that fast; agents and scripts do.
+  action: Contain the host (tier-aware) and collect evidence; revoke the session's user if it's not a known automation account.
+  uses: [ACT-01, ACT-03, ACT-09]
+  guardrails: Recommend-only for 2 weeks; allowlist inventory, monitoring and IT tooling by parent process and account.
+  done_when: Rule tuned and in auto mode for workstations; servers go to the triage agent.
+
+- id: A-14
+  name: Unapproved remote access or tunneling tool
+  type: auto-response
+  tier: 1
+  vectors: [walked, post-access]
+  stage: move
+  impact: H
+  effort: L
+  baseline: true
+  trigger: >
+    Execution or install of a remote access/RMM or tunneling tool not on the client's approved list
+    (AnyDesk, ScreenConnect, TeamViewer, Atera, ngrok, cloudflared, Tailscale, Chisel, etc.).
+  action: Kill the process, block its domains fleet-wide, and contain the host if it's a server or the tool came with other alerts.
+  uses: [ACT-10, ACT-07, ACT-01]
+  guardrails: Client-specific approved-tool list maintained with IT.
+  done_when: Approved list defined; rule in auto mode.
+
+- id: A-15
+  name: Ransomware precursors
+  type: auto-response
+  tier: 1
+  vectors: [post-access]
+  stage: cashout
+  impact: H
+  effort: L
+  baseline: true
+  trigger: Shadow copy deletion, backup catalog/job deletion, boot recovery disabled, mass stop of security/backup/database services, EDR ransomware behavior alerts.
+  action: Isolate the host and disable the acting user immediately; page.
+  uses: [ACT-01, ACT-04, ACT-09]
+  guardrails: Allowlist the backup software's own maintenance jobs.
+  done_when: Rule in auto mode; tested with a safe simulation.
+
+- id: A-16
+  name: Exfiltration tool on a server
+  type: auto-response
+  tier: 1
+  vectors: [post-access]
+  stage: cashout
+  impact: H
+  effort: L
+  baseline: true
+  trigger: rclone, MEGAsync/megacmd, restic, WinSCP/curl/scp to file-sharing or cloud-storage domains not used by the business, run on a server.
+  action: Kill the process, block the destination, contain the host (tier-aware).
+  uses: [ACT-10, ACT-07, ACT-01]
+  guardrails: Allowlist sanctioned backup/sync jobs by host and account.
+  done_when: Rule in auto mode on servers.
+
+# --------------------------------------------------------------------------
+# TIER 2: TRIAGE AGENT DETECTIONS. Agent investigates, then suggests actions;
+# each one graduates to auto once it has a track record.
+# --------------------------------------------------------------------------
+
+- id: D-01
+  name: Any high/critical EDR alert not covered by Tier 1
+  type: triage-detection
+  tier: 2
+  vectors: [pulled, pushed, post-access]
+  stage: any
+  impact: H
+  effort: L
+  baseline: true
+  trigger: EDR high/critical severity alert.
+  action: Agent runs the host evidence pack and blast radius sweep, classifies pulled/pushed/walked, and recommends close/escalate/contain with evidence.
+  uses: [ACT-01, ACT-10]
+  done_when: Every high/critical alert gets an agent write-up within 5 minutes.
+
+- id: D-02
+  name: Risky sign-in or session anomaly
+  type: triage-detection
+  tier: 2
+  vectors: [walked]
+  stage: entry
+  impact: H
+  effort: L
+  baseline: true
+  trigger: IdP risk detections, new device + new ISP, impossible travel, token replay, sign-in from anonymizing infrastructure.
+  action: Agent runs the identity evidence pack, checks post-login actions (inbox rules, OAuth consents, mass file access, MFA changes) and recent help desk tickets; recommends revoke/reset.
+  uses: [ACT-03, ACT-05]
+  done_when: Agent write-up on every medium+ IdP risk event.
+
+- id: D-03
+  name: New MFA method or help-desk reset followed by a new device
+  type: triage-detection
+  tier: 2
+  vectors: [walked]
+  stage: entry
+  impact: H
+  effort: L
+  baseline: true
+  trigger: MFA method registered (especially from a never-seen device/IP), or a help desk reset followed by sign-in from a new device within 24h.
+  action: Agent correlates with help desk ticket, prior device history and IP reputation; recommends removing the method and revoking sessions.
+  uses: [ACT-03, ACT-05]
+  done_when: Rule live; candidate to graduate to Tier 1 once false positive rate is known.
+
+- id: D-04
+  name: Server process spawning a shell (exploited service)
+  type: triage-detection
+  tier: 2
+  vectors: [pushed]
+  stage: entry
+  impact: H
+  effort: L
+  baseline: true
+  trigger: w3wp, httpd, nginx, java/tomcat, sqlservr, node, php spawning cmd/powershell/sh/bash, or a new script file written to a web directory.
+  action: Agent pulls the process tree and web logs; recommends isolate (tier A/B) or kill process + page (tier C).
+  uses: [ACT-01, ACT-10, ACT-09]
+  done_when: Rule live with known-good app behavior allowlisted. Strong candidate for Tier 1 after tuning.
+
+- id: D-05
+  name: New persistence on a server
+  type: triage-detection
+  tier: 2
+  vectors: [post-access]
+  stage: move
+  impact: M
+  effort: M
+  baseline: false
+  trigger: New service, scheduled task, WMI subscription, Run key, cron/systemd unit, authorized_keys change.
+  action: Agent checks signer, path, creator and fleet prevalence; WMI subscriptions recommend contain by default.
+  uses: [ACT-01, ACT-10]
+  done_when: Rule live on servers; workstation coverage via the weekly persistence sweep (I-04).
+
+- id: D-06
+  name: New identity persistence (no-malware access)
+  type: triage-detection
+  tier: 2
+  vectors: [walked, post-access]
+  stage: move
+  impact: H
+  effort: L
+  baseline: true
+  trigger: New privileged group membership, new OAuth app consent, new service principal secret, new cloud access key/user/admin policy, federation change.
+  action: Agent identifies the actor and the change ticket; recommends revert + revoke the actor's sessions.
+  uses: [ACT-03, ACT-06]
+  done_when: Rules live for the client's IdP and cloud(s).
+
+- id: D-07
+  name: Kerberoasting / credential spraying
+  type: triage-detection
+  tier: 2
+  vectors: [post-access]
+  stage: keys
+  impact: M
+  effort: L
+  baseline: false
+  trigger: Burst of RC4 Kerberos service ticket requests from one source, or failed logons across many accounts from one source.
+  action: Agent identifies the source host/user; recommends isolate + reset targeted service account passwords.
+  uses: [ACT-01, ACT-05]
+  done_when: Rule live; canary SPN (A-02) covers the high-fidelity case.
+
+- id: D-08
+  name: New kernel driver not seen in the fleet baseline
+  type: triage-detection
+  tier: 2
+  vectors: [post-access]
+  stage: guards
+  impact: M
+  effort: M
+  baseline: false
+  trigger: Driver load with a hash+signer+name not in the fleet baseline.
+  action: Agent checks LOLDrivers and signer reputation; known-vulnerable is handled by EDR tampering (A-04), unknown is recommended for review.
+  uses: [ACT-01]
+  done_when: Fleet driver baseline built; new drivers go to the agent.
+
+- id: D-09
+  name: Cloud enumeration burst or new admin grant
+  type: triage-detection
+  tier: 2
+  vectors: [walked]
+  stage: move
+  impact: M
+  effort: M
+  baseline: false
+  trigger: Spike of List/Describe/Get calls from one principal, unusual AssumeRole chains, admin policy attachments, trust policy changes.
+  action: Agent reviews the principal's history; recommends cutting off the principal.
+  uses: [ACT-06]
+  done_when: Rules live for clients with cloud workloads.
+
+- id: D-10
+  name: Server making a new outbound connection
+  type: triage-detection
+  tier: 2
+  vectors: [pushed, post-access]
+  stage: cashout
+  impact: M
+  effort: M
+  baseline: false
+  trigger: Server talks to an external IP/domain/ASN not seen in its 30-day baseline, or a large upload.
+  action: Agent checks the process, destination reputation and timing; recommends an egress block.
+  uses: [ACT-07, ACT-01]
+  done_when: Baseline exists for tier B/C servers.
+
+- id: D-11
+  name: Mass file download or external sharing in SaaS
+  type: triage-detection
+  tier: 2
+  vectors: [walked, post-access]
+  stage: cashout
+  impact: M
+  effort: L
+  baseline: false
+  trigger: One identity downloading or syncing an unusual number of files (M365/SharePoint/OneDrive, Google Drive, Box), or sharing many files externally.
+  action: Agent checks the identity's sign-in context and role; recommends revoking sessions.
+  uses: [ACT-03]
+  done_when: Rule live on the client's main file platform.
+
+- id: D-12
+  name: Edge device admin or config change
+  type: triage-detection
+  tier: 2
+  vectors: [pushed]
+  stage: entry
+  impact: H
+  effort: M
+  baseline: true
+  trigger: New admin account, admin login from an unusual source, config change, or firmware/image change on a VPN, firewall or other edge device. Also the edge device opening unexpected internal connections.
+  action: Agent checks change tickets and admin history; recommends disabling the admin account and blocking the device's internal access.
+  uses: [ACT-04, ACT-02]
+  done_when: Edge device logs in the SIEM with these rules live.
+
+- id: D-13
+  name: AI agent doing something it shouldn't
+  type: triage-detection
+  tier: 2
+  vectors: [pulled]
+  stage: any
+  impact: H
+  effort: M
+  baseline: true
+  ai: true
+  trigger: >
+    An AI agent, coding assistant or MCP server process (or agent identity in SaaS) spawning
+    download-and-execute or network tools, touching credential stores or decoy files, connecting to
+    new domains, or taking bulk actions (mass email, external sharing, permission changes) outside
+    its normal pattern.
+  action: Agent reviews the prompt/tool-call log and content the AI agent recently read (look for injected instructions); recommends the kill switch and blocking the source.
+  uses: [ACT-11, ACT-07, ACT-01]
+  done_when: Rules live for every agent in the inventory with write/execute ability.
+
+- id: D-14
+  name: New or unapproved MCP server, agent or AI connector
+  type: triage-detection
+  tier: 2
+  vectors: [pulled]
+  stage: entry
+  impact: H
+  effort: L
+  baseline: true
+  ai: true
+  trigger: >
+    New MCP server or agent extension in endpoint configs (e.g. mcp.json, IDE extensions), new
+    low-code agent or connector in the SaaS platform, or new OAuth consent to an AI app.
+  action: Agent checks it against the approved list and the publisher's reputation; recommends removal and revoking its grants.
+  uses: [ACT-11]
+  done_when: Approved list exists; new additions alert.
+
+# --------------------------------------------------------------------------
+# AUTOMATIC INVESTIGATIONS: evidence collected the moment something fires,
+# so the analyst or agent starts with answers, not queries.
+# --------------------------------------------------------------------------
+
+- id: I-01
+  name: Host evidence pack
+  type: auto-investigation
+  tier: 2
+  vectors: [pulled, pushed, post-access]
+  stage: any
+  impact: H
+  effort: M
+  baseline: true
+  trigger: Any Tier 1 action or Tier 2 detection involving a host.
+  action: >
+    From telemetry: process tree +/- 30 min, network connections, logons (who, type, from where),
+    files written, new persistence, Mark-of-the-Web / download source, EDR alert history for the host.
+  done_when: Pack is attached to the case automatically within 2 minutes.
+
+- id: I-02
+  name: Identity evidence pack
+  type: auto-investigation
+  tier: 2
+  vectors: [walked]
+  stage: any
+  impact: H
+  effort: M
+  baseline: true
+  trigger: Any Tier 1 action or Tier 2 detection involving a user, agent or principal.
+  action: >
+    7 days of sign-ins (IP, ASN, device, app), MFA method changes, active sessions, group
+    changes, OAuth consents, mailbox rules, help desk tickets, hosts logged on to.
+  done_when: Pack is attached to the case automatically within 2 minutes.
+
+- id: I-03
+  name: Blast radius sweep
+  type: auto-investigation
+  tier: 2
+  vectors: [pulled, pushed, walked]
+  stage: any
+  impact: H
+  effort: M
+  baseline: true
+  trigger: Any confirmed or contained incident.
+  action: Fleet-wide search for the same hash, domain, IP, user, email sender/subject, and parent-child pattern; list every hit.
+  done_when: Sweep runs automatically after containment and its results go into the case.
+
+- id: I-04
+  name: Weekly persistence stack-and-diff sweep
+  type: auto-investigation
+  tier: 2
+  vectors: [post-access]
+  stage: move
+  impact: M
+  effort: M
+  baseline: false
+  trigger: Weekly schedule.
+  action: Collect autoruns (Windows) and cron/systemd/authorized_keys/ld.so.preload (Linux) fleet-wide; stack rare entries; agent triages the diff.
+  done_when: First baseline collected; weekly diff lands in the agent queue.
+
+- id: I-05
+  name: Initial access classification
+  type: auto-investigation
+  tier: 2
+  vectors: [pulled, pushed, walked]
+  stage: entry
+  impact: M
+  effort: L
+  baseline: true
+  trigger: Any incident.
+  action: >
+    Classify pulled (parent = email/browser/AI agent, workstation), pushed (server process
+    parent, internet-facing host), or walked (valid login, no malware). This drives the blast radius
+    sweep: pulled = email recipients, pushed = other exposed hosts, walked = other sessions of the identity.
+  done_when: Classification is a required field on every case.
+
+# --------------------------------------------------------------------------
+# MANUAL ACTIONS: pre-staged runbooks for decisions too big to automate.
+# --------------------------------------------------------------------------
+
+- id: M-01
+  name: Mass session revocation and privileged password reset
+  type: manual-action
+  tier: 2
+  vectors: [walked, post-access]
+  stage: keys
+  impact: H
+  effort: L
+  baseline: true
+  action: Scripted runbook to revoke all sessions for a group (e.g. all admins) and force reset, including service accounts with an owner list.
+  done_when: Runbook exists and was dry-run against a test group.
+
+- id: M-02
+  name: Contain a tier C (crown-jewel) server
+  type: manual-action
+  tier: 2
+  vectors: [pushed, post-access]
+  stage: move
+  impact: H
+  effort: L
+  baseline: true
+  action: Per-server runbook covering block lateral/egress at the firewall, snapshot, disable the service account, and who must approve full isolation.
+  done_when: Runbook exists for every tier C server class (DCs, hypervisors, databases, IdP connectors, etc.).
+
+- id: M-03
+  name: Cut third-party and remote access
+  type: manual-action
+  tier: 2
+  vectors: [walked]
+  stage: entry
+  impact: H
+  effort: L
+  baseline: true
+  action: Kill switch list covering VPN, RMM tools, vendor accounts, SaaS integrations, AI connectors and API tokens, with the exact steps to disable each.
+  done_when: List exists with owners and disable steps.
+
+- id: M-04
+  name: Domain-wide credential reset (krbtgt x2, Tier 0 accounts)
+  type: manual-action
+  tier: 2
+  vectors: [post-access]
+  stage: keys
+  impact: H
+  effort: M
+  baseline: false
+  action: Tested runbook for a double krbtgt reset, Tier 0 account resets and IdP connector secret rotation.
+  done_when: Runbook reviewed; krbtgt reset tested in a lab or performed in production.
+
+- id: M-05
+  name: Segment-wide internet egress kill switch
+  type: manual-action
+  tier: 2
+  vectors: [post-access]
+  stage: cashout
+  impact: M
+  effort: M
+  baseline: false
+  action: Pre-built firewall rule set to cut egress for a segment or site, except to EDR/IdP/SIEM.
+  done_when: Rule set exists (disabled) and the owner knows how to enable it.
+
+# --------------------------------------------------------------------------
+# HARDENING: the few preventive controls that make Tier 1 detections cleaner
+# and slow agents down. Only the 80/20 ones.
+# --------------------------------------------------------------------------
+
+- id: H-01
+  name: Phishing-resistant MFA for admins
+  type: hardening
+  tier: 0
+  vectors: [walked]
+  stage: entry
+  impact: H
+  effort: M
+  baseline: true
+  action: FIDO2/passkeys or platform-bound authenticators for all IdP, EDR, SIEM, cloud and domain admins. Device compliance required for admin portals.
+  done_when: 100% of privileged accounts use phishing-resistant MFA.
+
+- id: H-02
+  name: Block workstation-to-workstation SMB/RDP/WinRM
+  type: hardening
+  tier: 0
+  vectors: [post-access]
+  stage: move
+  impact: H
+  effort: M
+  baseline: false
+  action: Host firewall policy allowing inbound admin protocols on workstations only from jump hosts/IT subnets.
+  done_when: Policy enforced fleet-wide; workstation-to-workstation detection (A-10) catches violations.
+
+- id: H-03
+  name: Block Office child processes and script abuse
+  type: hardening
+  tier: 0
+  vectors: [pulled]
+  stage: entry
+  impact: H
+  effort: L
+  baseline: true
+  action: EDR/OS prevention rules blocking Office apps from creating child processes and executable content, plus credential-stealing protection for LSASS.
+  done_when: Rules in block mode on workstations.
+
+- id: H-04
+  name: Unique local admin passwords, no standing local admin
+  type: hardening
+  tier: 0
+  vectors: [post-access]
+  stage: move
+  impact: H
+  effort: M
+  baseline: false
+  action: LAPS (or equivalent) everywhere; remove users from local admin.
+  done_when: LAPS coverage > 95%; local admin membership report is clean.
+
+- id: H-05
+  name: Driver protection (HVCI + vulnerable driver blocklist)
+  type: hardening
+  tier: 0
+  vectors: [post-access]
+  stage: guards
+  impact: M
+  effort: M
+  baseline: false
+  action: Enable memory integrity (HVCI) and the vulnerable driver blocklist; move toward a driver allowlist.
+  done_when: Enabled on servers and workstations where compatible.
+
+- id: H-06
+  name: Lock down the EDR console itself
+  type: hardening
+  tier: 0
+  vectors: [walked]
+  stage: guards
+  impact: H
+  effort: L
+  baseline: true
+  action: Phishing-resistant MFA, small admin list, alerts on policy/exclusion changes and on uninstall-token retrieval.
+  done_when: Console admin list reviewed and changes generate alerts.
+
+- id: H-07
+  name: Least privilege for AI agents
+  type: hardening
+  tier: 0
+  vectors: [pulled]
+  stage: entry
+  impact: H
+  effort: M
+  baseline: true
+  ai: true
+  action: >
+    Each agent runs as its own identity (never a human's admin account), with only the tools and
+    data it needs, human approval for destructive or outbound actions (send, delete, share,
+    execute), and an approved list of MCP servers/connectors.
+  done_when: Every agent that can write or execute has its own identity and an approval step for destructive actions.
